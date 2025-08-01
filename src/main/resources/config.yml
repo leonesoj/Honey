@@ -1,0 +1,83 @@
+#  ______  __
+#  ___  / / /______________________  __
+#  __  /_/ /_  __ \_  __ \  _ \_  / / /
+#  _  __  / / /_/ /  / / /  __/  /_/ /
+#  /_/ /_/  \____//_/ /_/\___/_\__, /
+#                             /____/
+# Resource Page: https://modrinth.com/project/xQ3pgVap
+# Wiki: https://github.com/leonesoj/honey/wiki
+
+database:
+  # Options: SQLite, (MySQL, and MongoDB: required on a Velocity network)
+  provider: "SQLite"
+  config:
+    address: ""
+    database: "honey"
+    port: 2025
+    username: ""
+    password: ""
+    #connection_string: ""
+
+cache:
+  # Options: In-Memory or Redis(required on a Velocity network)
+  # If you're running a single server instance, strongly consider switching to Redis if you experience
+  # high memory usage. As in-memory cache stores all data in-memory.
+  provider: "in-memory"
+  # Upstash offers a very capable free Redis database with affordable paid options, if you need to scale
+  # If choose to use a different provider, make sure they support SSL.
+  redis_config:
+    host: ""
+    port: 2025
+    password: ""
+
+server:
+  # This identifier must be unique across your entire network.
+  identifier: "hive1"
+  # Server links are useful for listing information regarding your server like announcements, forums
+  # status, support, etc.
+  links:
+    honey: # This key can be anything
+      display_name: "<white>Powered by</white> <i><gradient:#FFA142:#F6C26B>Honey</gradient></i>"
+      url: "https://modrinth.com/project/xQ3pgVap" # URL must be formatted properly
+  listing:
+    show_player_list: false # Shows a small list of online players, excluding staff mode players
+    hide_player_count: false # If this option is disabled, player count will be displayed as ???
+    motd:
+      entry_one:
+        icon: "honey_icon"
+        lines:
+          - "                     <gold>🗡</gold> <gray>Minecraft Server</gray> <gold>⛏</gold>"
+          - "                                           <gray>Powered by</gray> <gold><i>Honey</i></gold>"
+      entry_two:
+        icon: "bee_icon"
+        lines:
+          - "<gold>Bzzzzzzzz...</gold>"
+
+chat:
+  # Default channel is the chat channel for which all users will be automatically added as a participant
+  default_channel: "general"
+  # Placeholders:
+  # - <display_name> : The player's display name(maybe changed by other plugins)
+  # - <username> : The player's username(static and always reflects their true name)
+  # - <prefix> : The player's prefix denoted by their primary group
+  # - <suffix> : The player's suffix denoted by their primary group
+  # Permissions:
+  # - Slow Talk Bypass : honey.chat.<channel_identifier_here>.bypass.slow
+  # - Mute Talk Bypass : honey.chat.<channel_identifier_here>.bypass.mute
+  channels:
+    general:
+      format: "<prefix><light_purple><display_name>:</light_purple> <white><message></white>"
+    staff:
+      format: "<gold><display_name>:</gold> <white><message></white>"
+  private_messaging:
+    format:
+      to_user: "<gray>(<i>You</i> » <recipient>):</gray> <white><message></white>"
+      from_user: "<gray>(<sender> » <i>You</i>):</gray> <white><message></white>"
+    max_chat_history: 150
+
+
+staff_mode:
+  # Enable this as a safeguard against unexpected server crashes, where Honey would otherwise be
+  # unable to restore a staff's player state prior to enabling staff mode.
+  # You can safely disable this if preserving their inventories isn't a critical loss.
+  persist-staff-data: true

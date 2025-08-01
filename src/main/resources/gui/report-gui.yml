@@ -1,0 +1,430 @@
+# GUI information: https://github.com/leonesoj/honey/wiki/gui
+
+main:
+  title:
+    en-US: "Player Report"
+    es-MX: "Reporte de Jugador"
+  size: 27
+  decorator:
+    type: checkerboard
+    checkerboard_item_one:
+      type: red_stained_glass_pane
+    checkerboard_item_two:
+      type: gray_stained_glass_pane
+  items:
+    hacking_category:
+      type: iron_sword
+      slot: 11
+      display_name:
+        en-US: "<red>Modified Client (Hacks)</red>"
+        es-MX: "MX Spanish display_name"
+      lore:
+        en-US:
+          - <gray>Subject is cheating by using an</gray>
+          - <gray>unauthorized client or exploits</gray>
+          - <gray>to gain an unfair advantage</gray>
+          - ""
+          - "<i><green>Click to open</green></i>"
+    chat_category:
+      type: writable_book
+      slot: 13
+      display_name:
+        en-US: "<light_purple>Chat Abuse</light_purple>"
+      lore:
+        en-US:
+          - <gray>Subject is using chat to harass,</gray>
+          - <gray>spam, or otherwise disrupt</gray>
+          - <gray>the server environment</gray>
+          - ""
+          - "<i><green>Click to open</green></i>"
+    other_category:
+      type: bookshelf
+      slot: 15
+      display_name:
+        en-US: "<blue>Other</blue>"
+      lore:
+        en-US:
+          - <gray>Subject has committed offenses</gray>
+          - <gray>that don't fall under the</gray>
+          - <gray>main predefined categories</gray>
+          - ""
+          - "<i><green>Click to open</green></i>"
+hacking_category_gui:
+  title:
+    en-US: "Player Report: <red>Hacking</red>"
+  size: 45
+  decorator:
+    type: "border"
+    border_item:
+      type: red_stained_glass_pane
+  items:
+    cancel_item:
+      type: barrier
+      slot: 44
+      display_name:
+        en-US: "<i><red>Cancel</red></i>"
+    back_item:
+      type: arrow
+      slot: 36
+      display_name:
+        en-US: "<i><gray>Go Back</gray></i>"
+    information_item:
+      type: book
+      slot: 0
+      display_name:
+        en-US: "<i><gold>Information</gold></i>"
+    subject_head:
+      type: player_head
+      slot: 8
+      display_name:
+        en-US: "<gray>Reporting:</gray> <i><red>%subject_name%</red></i>"
+  report_items:
+    kill_aura:
+      type: iron_sword
+      slot: 10
+      display_name: <bold><dark_red>KillAura</dark_red></bold>
+      lore:
+        en-US:
+          - "<gray>Automatically attacks nearby</gray>"
+          - "<gray>entities, often accompanied by</gray>"
+          - "<gray>rapid or abnormal head</gray>"
+          - "<gray>movements and no manual aiming.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "killaura"
+    aimbot:
+      type: golden_apple
+      slot: 11
+      display_name: <bold><light_purple>Aimbot</light_purple></bold>
+      lore:
+        en-US:
+          - "<gray>Automatically aims at targets</gray>"
+          - "<gray>with precise and unnatural</gray>"
+          - "<gray>accuracy, removing the need</gray>"
+          - "<gray>for manual crosshair control.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "aimbot"
+    bunny_hopping:
+      type: carrot
+      slot: 12
+      display_name: <bold><green>BunnyHopping</green></bold>
+      lore:
+        en-US:
+          - "<gray>Abnormally jumps to gain increased</gray>"
+          - "<gray>walk speeds that are otherwise</gray>"
+          - "<gray>impossible to achieve in normal</gray>"
+          - "<gray>vanilla situations.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "bunny_hopping"
+    flight:
+      type: feather
+      slot: 13
+      display_name: <bold><light_purple>Flight</light_purple></bold>
+      lore:
+        en-US:
+          - "<gray>Enables the player to fly freely</gray>"
+          - "<gray>by bypassing vanilla movement</gray>"
+          - "<gray>restrictions and gravity</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "flight"
+    fast_bow:
+      type: bow
+      slot: 14
+      display_name: <bold><gold>FastBow</gold></bold>
+      lore:
+        en-US:
+          - "<gray>Allows rapid shooting of arrows</gray>"
+          - "<gray>by removing or reducing vanilla</gray>"
+          - "<gray>bow draw time, enabling quicker attacks.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "fast_bow"
+    speed:
+      type: sugar
+      slot: 15
+      display_name: <bold><white>Speed</white></bold>
+      lore:
+        en-US:
+          - "<gray>Increases player movement speed</gray>"
+          - "<gray>beyond vanilla limits by altering</gray>"
+          - "<gray>normal game physics and mechanics.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "speed"
+    anti_knockback:
+      type: lead
+      slot: 16
+      display_name: <bold><blue>AntiKB</blue></bold>
+      lore:
+        en-US:
+          - "<gray>Prevents or reduces knockback</gray>"
+          - "<gray>from attacks or explosions,</gray>"
+          - "<gray>keeping the player stable and grounded.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "anti_knockback"
+    auto_armor:
+      type: diamond_chestplate
+      slot: 19
+      display_name: <bold><yellow>AutoArmor</yellow></bold>
+      lore:
+        en-US:
+          - "<gray>Automatically equips the best armor</gray>"
+          - "<gray>available in the inventory</gray>"
+          - "<gray>without manual input.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "auto_armor"
+    auto_soup:
+      type: mushroom_stew
+      slot: 20
+      display_name: <bold><dark_purple>AutoSoup</dark_purple></bold>
+      lore:
+        en-US:
+          - "<gray>Automatically consumes soup</gray>"
+          - "<gray>to quickly restore health</gray>"
+          - "<gray>when the player's health is low.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "auto_soup"
+    auto_pot:
+      type: redstone
+      slot: 21
+      display_name: <bold><red>AutoPot</red></bold>
+      lore:
+        en-US:
+          - "<gray>Automatically throws splash health potions</gray>"
+          - "<gray>when the player's health is low</gray>"
+          - "<gray>without manual input during combat.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "auto_pot"
+    xray:
+      type: diamond_ore
+      slot: 22
+      display_name: <bold><aqua>X-Ray</aqua></bold>
+      lore:
+        en-US:
+          - "<gray>Allows the player to see through</gray>"
+          - "<gray>blocks to locate ores, valuable</gray>"
+          - "<gray>resources, and other players.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "xray"
+    phase:
+      type: ghast_tear
+      slot: 23
+      display_name: <bold><yellow>Phase</yellow></bold>
+      lore:
+        en-US:
+          - "<gray>Enables the player to move through</gray>"
+          - "<gray>solid blocks by bypassing collision</gray>"
+          - "<gray>and movement restrictions.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "phase"
+    scaffold:
+      type: scaffolding
+      slot: 24
+      display_name: <bold><red>Scaffold</red></bold>
+      lore:
+        en-US:
+          - "<gray>Automatically places blocks beneath</gray>"
+          - "<gray>the player while moving, allowing</gray>"
+          - "<gray>faster and easier bridging.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "scaffold"
+    reach:
+      type: golden_sword
+      slot: 25
+      display_name: <bold><gold>Reach</gold></bold>
+      lore:
+        en-US:
+          - "<gray>Extends the distance at which</gray>"
+          - "<gray>the player can hit or interact</gray>"
+          - "<gray>with entities and blocks.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "reach"
+chat_category_gui:
+  title:
+    en-US: "Player Report: <light_purple>Chat Abuse</light_purple>"
+  size: 27
+  decorator:
+    type: "border"
+    border_item:
+      type: red_stained_glass_pane
+  items:
+    cancel_item:
+      type: barrier
+      slot: 26
+      display_name:
+        en-US: "<i><red>Cancel</red></i>"
+    back_item:
+      type: arrow
+      slot: 18
+      display_name:
+        en-US: "<i><gray>Go Back</gray></i>"
+    information_item:
+      type: book
+      slot: 0
+      display_name:
+        en-US: "<i><gold>Information</gold></i>"
+    subject_head:
+      type: player_head
+      slot: 8
+      display_name:
+        en-US: "<gray>Reporting:</gray> <i><red>%subject_name%</red></i>"
+  report_items:
+    racism:
+      type: map
+      slot: 10
+      display_name: "<bold><red>Racism</red></bold>"
+      lore:
+        en-US:
+          - "<gray>Using racial slurs, symbols, or</gray>"
+          - "<gray>offensive language targeting a race</gray>"
+          - "<gray>in chat, builds, or usernames.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "racism"
+    advertising:
+      type: oak_sign
+      slot: 11
+      display_name: "<bold><light_purple>Advertising</light_purple></bold>"
+      lore:
+        en-US:
+          - "<gray>Promoting other servers, websites,</gray>"
+          - "<gray>or services without permission</gray>"
+          - "<gray>in chat, signs, or builds.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "advertising"
+    spam:
+      type: writable_book
+      slot: 12
+      display_name: "<bold><blue>Spam</blue></bold>"
+      lore:
+        en-US:
+          - "<gray>Flooding the chat with repeated</gray>"
+          - "<gray>messages, commands, or characters</gray>"
+          - "<gray>that disrupt normal communication.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "spam"
+    threats:
+      type: blaze_rod
+      slot: 13
+      display_name: "<bold><yellow>Threats</yellow></bold>"
+      lore:
+        en-US:
+          - "<gray>Making serious or harmful statements</gray>"
+          - "<gray>intended to intimidate, harass, or</gray>"
+          - "<gray>cause fear to other players.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "threats"
+other_category_gui:
+  title:
+    en-US: "Player Report: <blue>Other</blue>"
+  size: 27
+  decorator:
+    type: "border"
+    border_item:
+      type: red_stained_glass_pane
+  items:
+    cancel_item:
+      type: barrier
+      slot: 26
+      display_name:
+        en-US: "<i><red>Cancel</red></i>"
+    back_item:
+      type: arrow
+      slot: 18
+      display_name:
+        en-US: "<i><gray>Go Back</gray></i>"
+    information_item:
+      type: book
+      slot: 0
+      display_name:
+        en-US: "<i><gold>Information</gold></i>"
+    subject_head:
+      type: player_head
+      slot: 8
+      display_name:
+        en-US: "<gray>Reporting:</gray> <i><red>%subject_name%</red></i>"
+  report_items:
+    duping:
+      type: hopper
+      slot: 10
+      display_name: "<bold><dark_red>Duping</dark_red></bold>"
+      lore:
+        en-US:
+          - "<gray>Exploits game mechanics or bugs</gray>"
+          - "<gray>to create extra copies of</gray>"
+          - "<gray>items without legitimate means.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "duping"
+    exploiting:
+      type: enchanted_book
+      slot: 11
+      display_name: "<bold><green>Exploiting</green></bold>"
+      lore:
+        en-US:
+          - "<gray>Abuses unintended game mechanics</gray>"
+          - "<gray>or glitches to perform actions</gray>"
+          - "<gray>not possible in normal gameplay.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "exploiting"
+    bad_skin:
+      type: player_head
+      slot: 12
+      display_name: "<bold><yellow>Bad Skin</yellow></bold>"
+      lore:
+        en-US:
+          - "<gray>Wearing a player skin that</gray>"
+          - "<gray>contains offensive or suggestive</gray>"
+          - "<gray>imagery or themes.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "bad_skin"
+    bad_name:
+      type: name_tag
+      slot: 13
+      display_name: "<bold><aqua>Bad Name</aqua></bold>"
+      lore:
+        en-US:
+          - "<gray>Using a username or nickname</gray>"
+          - "<gray>that contains offensive, vulgar,</gray>"
+          - "<gray>or inappropriate language.</gray>"
+          - ""
+          - "<i><green>Click to select</green></i>"
+      other_data:
+        reason: "bad_name"

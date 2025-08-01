@@ -1,0 +1,48 @@
+main:
+  title:
+    en-US: "Settings"
+    es-MX: "Ajustes"
+  size: 27
+  decorator:
+    type: "checkerboard"
+    checkerboard_item_one:
+      type: orange_stained_glass_pane
+    checkerboard_item_two:
+      type: white_stained_glass_pane
+  items:
+    chat_messages:
+      type: book
+      slot: 10
+      display_name:
+        en-US: "<aqua>Chat Messages</aqua>"
+        es-MX: "<aqua>Mensajes de Chat</aqua>"
+      lore:
+        en-US:
+          - "<gray>Currently:</gray> %status%"
+    private_messages:
+      type: enchanted_book
+      slot: 12
+      display_name:
+        en-US: "<light_purple>Private Messages</light_purple>"
+        es-MX: "<light_purple>Mensajes Privados</light_purple>"
+      lore:
+        en-US:
+          - "<gray>Currently:</gray> %status%"
+    profanity_filter:
+      type: lectern
+      slot: 14
+      display_name:
+        en-US: "<red>Profanity Filter</red>"
+        es-MX: "<red>Filtro Profano</red>"
+      lore:
+        en-US:
+          - "<gray>Currently:</gray> %status%"
+    sound_alerts:
+      type: note_block
+      slot: 16
+      display_name:
+        en-US: "<gold>Sound Alerts</gold>"
+        es-MX: "<gold>Alertas de Sonido</gold>"
+      lore:
+        en-US:
+          - "<gray>Currently:</gray> %status%"

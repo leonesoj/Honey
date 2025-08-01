@@ -1,0 +1,75 @@
+main:
+  title:
+    en-US: "Reports"
+    es-MX: "Reportes"
+  size: 54
+  decorator:
+    type: border
+    border_item:
+      type: red_stained_glass_pane
+  items:
+    report_item:
+      type: book
+      display_name:
+        en-US: "Report"
+report_viewer:
+  title:
+    en-US: ""
+    es-MX: ""
+  size: 45
+  decorator:
+    type: "checkerboard"
+    checkerboard_item_one:
+      type: red_stained_glass_pane
+    checkerboard_item_two:
+      type: gray_stained_glass_pane
+  items:
+    issuer_head:
+      type: player_head
+      slot: 11
+      display_name:
+        en-US: "<gray>Issuer:</gray> <green>{issuer-name}</green>"
+        es-MX: ""
+    report_info:
+      type: enchanted_book
+      slot: 13
+      display_name:
+        en-US: "<gray>Report:</gray> <yellow>{report-id}</yellow>"
+        es-MX: ""
+    subject_head:
+      type: player_head
+      slot: 15
+      display_name:
+        en-US: "<gray>Subject:</gray> <red>{subject-name}</red>"
+        es-MX: ""
+      lore:
+        en-US:
+          - "<gray>Status:</gray> <green>ONLINE</green>"
+          - "<gray>Playtime:</gray> <green>20.25 Hours</green>"
+          - "<gray>Last Seen(Server):</gray> <green>hive1</green>"
+          - "<gray>Reported:</gray> <green>5 times</green>"
+          - ""
+          - "<gold>Click to teleport</gold>"
+          - "<light_purple><bold>Shift+Click</bold> to teleport</light_purple>"
+          - "<light_purple>in staff mode</light_purple>"
+    mark_as_noted:
+      type: yellow_terracotta
+      slot: 30
+      display_name:
+        en-US: "<gray>Mark as <bold>Noted</bold></gray>"
+        es-MX: ""
+    pending_review:
+      type: white_terracotta
+      slot: 31
+      display_name:
+        en-US: "<gray>Pending Review</gray>"
+    mark_as_resolved:
+      type: lime_terracotta
+      slot: 32
+      display_name:
+        en-US: "<gray>Mark as <bold>Resolved</bold></gray>"
+    exit_item:
+      type: barrier
+      slot: 35
+      display_name:
+        en-US: "<red><i>Exit</i></red>"

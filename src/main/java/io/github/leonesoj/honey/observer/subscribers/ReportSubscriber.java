@@ -1,0 +1,39 @@
+package io.github.leonesoj.honey.observer.subscribers;
+
+import io.github.leonesoj.honey.Honey;
+import io.github.leonesoj.honey.database.data.model.Report;
+import io.github.leonesoj.honey.observer.Observer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.translation.Argument;
+import org.bukkit.Bukkit;
+
+import static io.github.leonesoj.honey.locale.Message.argComponent;
+
+public class ReportSubscriber implements Observer<Report> {
+
+  @Override
+  public void onCreate(Report report) {
+    Bukkit.getOnlinePlayers().forEach(player -> {
+      if (player.hasPermission("honey.management.staff")) {
+        Honey.getInstance().getStaffHandler().getSessionController()
+            .getOrCreateSession(player.getUniqueId())
+            .thenAccept(optional -> optional.ifPresent(staffSession -> {
+              if (staffSession.hasReportAlerts()) {
+                player.sendMessage(
+                    Component.translatable("honey.report.broadcast",
+                        argComponent("issuer", Bukkit.getPlayer(report.getIssuer()).getName()),
+                        argComponent("subject", Bukkit.getPlayer(report.getSubject()).getName()),
+                        argComponent("reason", report.getReason().toUpperCase()),
+                        Argument.tagResolver(
+                            Placeholder.styling("view-report",
+                                ClickEvent.runCommand("reports " + report.getId())))
+                    )
+                );
+              }
+            }));
+      }
+    });
+  }
+}

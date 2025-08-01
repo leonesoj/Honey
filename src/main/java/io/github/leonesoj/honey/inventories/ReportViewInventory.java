@@ -1,0 +1,120 @@
+package io.github.leonesoj.honey.inventories;
+
+import com.destroystokyo.paper.profile.PlayerProfile;
+import io.github.leonesoj.honey.Honey;
+import io.github.leonesoj.honey.database.data.model.Report;
+import io.github.leonesoj.honey.database.data.model.Report.ReportStatus;
+import io.github.leonesoj.honey.utils.inventory.ReactiveInventory;
+import io.github.leonesoj.honey.utils.inventory.SerializedItem;
+import io.github.leonesoj.honey.utils.inventory.SimpleInventory;
+import java.util.Locale;
+import java.util.function.Consumer;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+
+import static io.github.leonesoj.honey.locale.Message.prefixed;
+
+public class ReportViewInventory extends ReactiveInventory<Report> {
+
+  private final Report report;
+
+  public ReportViewInventory(Report report, Locale locale, SimpleInventory parent) {
+    super(Honey.getInstance(),
+        Honey.getInstance().getConfigHandler().getReportViewerGui()
+            .getConfigurationSection("report_view"),
+        locale,
+        Honey.getInstance().getDataHandler().getReportController().getObserverService(),
+        parent
+    );
+
+    this.report = report;
+  }
+
+  @Override
+  protected void buildContent() {
+    SerializedItem issuer = parseItem("issuer");
+    addItem(issuer);
+
+    SerializedItem subject = parseItem("subject");
+    addItem(subject);
+
+    SerializedItem reportItem = parseItem("report_item");
+    reportItem.item()
+        .addPlaceHolder("short-id", Component.text(report.getId().toString().substring(0, 8)))
+        .addPlaceHolder("long-id", Component.text(report.getId().toString()))
+        .addPlaceHolder("reason", Component.text(report.getReason()))
+        .addPlaceHolder("status", Component.text(report.getStatus().name()))
+        .addPlaceHolder("server", Component.text(report.getServer()));
+    addItem(reportItem);
+
+    addItem(parseItem("mark_as_resolved"), event -> {
+
+    });
+    addItem(parseItem("mark_as_noted"));
+
+    if (getParent() != null) {
+      SerializedItem backItem = parseItem("back_item");
+      addItem(backItem, event -> goToParent((Player) event.getWhoClicked()));
+    }
+
+    addItem(parseItem("exit_item"),
+        event -> event.getWhoClicked().closeInventory()
+    );
+
+    addItem(parseItem("delete_item"), deleteReport());
+
+    Bukkit.getAsyncScheduler().runNow(Honey.getInstance(), task -> {
+      OfflinePlayer issuerPlayer = Bukkit.getOfflinePlayer(report.getIssuer());
+      PlayerProfile issuerProfile = getProfile(issuerPlayer);
+
+      OfflinePlayer subjectPlayer = Bukkit.getOfflinePlayer(report.getSubject());
+      PlayerProfile subjectProfile = getProfile(subjectPlayer);
+
+      subject.item()
+          .asPlayerHead(subjectPlayer, subjectProfile)
+          .addPlaceHolder("name", subjectPlayer.getName())
+          .addPlaceHolder("status", Boolean.toString(subjectPlayer.isOnline()));
+      addItem(subject);
+
+      issuer.item()
+          .asPlayerHead(issuerPlayer, issuerProfile)
+          .addPlaceHolder("name", issuerPlayer.getName())
+          .addPlaceHolder("status", Boolean.toString(subjectPlayer.isOnline()));
+      addItem(issuer);
+    });
+
+  }
+
+  private Consumer<InventoryClickEvent> changeReportStatus(ReportStatus status) {
+    return event -> {
+      report.setStatus(status);
+      Honey.getInstance().getDataHandler().getReportController().updateReport(report);
+    };
+  }
+
+  private Consumer<InventoryClickEvent> deleteReport() {
+    return event -> {
+      Player player = (Player) event.getWhoClicked();
+      player.closeInventory();
+
+      Honey.getInstance().getDataHandler().getReportController().deleteReport(report.getId())
+          .thenAccept(result -> {
+            if (result) {
+              player.sendMessage(prefixed("honey.report.deleted.success"));
+            } else {
+              player.sendMessage(prefixed("honey.report.deleted.failure"));
+            }
+          });
+    };
+  }
+
+  private PlayerProfile getProfile(OfflinePlayer player) {
+    return player.isOnline() ? player.getPlayerProfile()
+        : Bukkit.createProfile(player.getUniqueId(), player.getName());
+  }
+
+}
+

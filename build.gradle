@@ -1,0 +1,84 @@
+plugins {
+    id 'java'
+    id 'checkstyle'
+    id 'xyz.jpenilla.run-paper' version '2.3.1'
+}
+
+group = 'io.github.leonesoj'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'papermc-repo'
+        url = 'https://repo.papermc.io/repository/maven-public/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+    maven {
+        name = 'lunarclient'
+        url = 'https://repo.lunarclient.dev'
+    }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://repo.extendedclip.com/releases/' }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT'
+    compileOnly 'net.luckperms:api:5.4'
+    compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
+    compileOnly 'me.clip:placeholderapi:2.11.6'
+    compileOnly 'com.lunarclient:apollo-api:1.1.7'
+    compileOnly 'io.lettuce:lettuce-core:6.5.5.RELEASE'
+    compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
+    compileOnly 'com.zaxxer:HikariCP:6.3.0'
+    compileOnly platform('org.mongodb:mongodb-driver-bom:5.4.0')
+    compileOnly 'org.mongodb:mongodb-driver-sync'
+    compileOnly 'com.github.ben-manes.caffeine:caffeine:3.2.0'
+    compileOnly 'org.bstats:bstats-bukkit:3.1.0'
+    testImplementation 'org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.46.3'
+}
+
+tasks {
+    runServer {
+        minecraftVersion '1.21.8'
+        downloadPlugins {
+            modrinth ('luckperms', 'v5.5.0-bukkit')
+            modrinth ('lunar-client-apollo', '1.1.8')
+        }
+    }
+}
+
+checkstyle {
+    toolVersion '10.23.1'
+}
+
+def targetJavaVersion = 21
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release.set(targetJavaVersion)
+    }
+}
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('paper-plugin.yml') {
+        expand props
+    }
+}
