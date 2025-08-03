@@ -30,7 +30,7 @@ public class IgnoreCommand {
     Player target = ctx.getArgument("player", Player.class);
 
     if (target.hasPermission("honey.management.staff")) {
-      target.sendMessage(Component.translatable("honey.settings.ignore.staff"));
+      sender.sendMessage(Component.translatable("honey.settings.ignore.staff"));
       return Command.SINGLE_SUCCESS;
     }
 
