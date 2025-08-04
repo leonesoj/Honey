@@ -12,7 +12,6 @@ import io.github.leonesoj.honey.commands.essentials.player.FeedCommand;
 import io.github.leonesoj.honey.commands.essentials.player.FlyCommand;
 import io.github.leonesoj.honey.commands.essentials.player.GodCommand;
 import io.github.leonesoj.honey.commands.essentials.player.HealCommand;
-import io.github.leonesoj.honey.commands.essentials.player.HelpCommand;
 import io.github.leonesoj.honey.commands.essentials.player.PingCommand;
 import io.github.leonesoj.honey.commands.essentials.player.ReportCommand;
 import io.github.leonesoj.honey.commands.essentials.player.SettingsCommand;
@@ -23,15 +22,14 @@ import io.github.leonesoj.honey.commands.essentials.world.NightCommand;
 import io.github.leonesoj.honey.commands.essentials.world.OverworldCommand;
 import io.github.leonesoj.honey.commands.essentials.world.TheEndCommand;
 import io.github.leonesoj.honey.commands.management.BackendCommand;
-import io.github.leonesoj.honey.commands.messaging.ReplyCommand;
-import io.github.leonesoj.honey.commands.moderation.ChatCommand;
-import io.github.leonesoj.honey.commands.management.MaintenanceCommand;
 import io.github.leonesoj.honey.commands.management.ReportsCommand;
 import io.github.leonesoj.honey.commands.messaging.ChannelCommand;
 import io.github.leonesoj.honey.commands.messaging.IgnoreCommand;
 import io.github.leonesoj.honey.commands.messaging.MessageCommand;
+import io.github.leonesoj.honey.commands.messaging.ReplyCommand;
 import io.github.leonesoj.honey.commands.messaging.UnignoreCommand;
 import io.github.leonesoj.honey.commands.moderation.BanCommand;
+import io.github.leonesoj.honey.commands.moderation.ChatCommand;
 import io.github.leonesoj.honey.commands.moderation.SocialSpyCommand;
 import io.github.leonesoj.honey.commands.moderation.StaffCommand;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
@@ -56,7 +54,6 @@ public class HoneyBootstrap implements PluginBootstrap {
       commands.registrar().register(ReportCommand.create());
       commands.registrar().register(SpeedCommand.create());
       commands.registrar().register(PingCommand.create());
-      commands.registrar().register(HelpCommand.create());
 
       /* ITEM COMMANDS */
       commands.registrar().register(LoreCommand.create());
@@ -82,7 +79,6 @@ public class HoneyBootstrap implements PluginBootstrap {
       /* MANAGEMENT COMMANDS */
       commands.registrar().register(BackendCommand.create());
       commands.registrar().register(ReportsCommand.create());
-      commands.registrar().register(MaintenanceCommand.create());
 
       /* MODERATION COMMANDS */
       commands.registrar().register(BanCommand.create());
