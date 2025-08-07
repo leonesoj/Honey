@@ -4,6 +4,12 @@ import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.chat.SpyService;
 import io.github.leonesoj.honey.database.data.controller.SettingsController;
 import io.github.leonesoj.honey.database.data.model.PlayerSettings;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -16,8 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-
-import java.util.*;
 
 public class PrivateChatService implements Listener {
 

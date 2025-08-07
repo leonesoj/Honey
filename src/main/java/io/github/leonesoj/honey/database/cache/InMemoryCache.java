@@ -2,7 +2,6 @@ package io.github.leonesoj.honey.database.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.Weigher;
 import io.github.leonesoj.honey.database.data.model.DataModel;
 import io.lettuce.core.json.JsonObject;
 import java.util.Optional;
@@ -10,8 +9,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.logging.Logger;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 
 public class InMemoryCache extends CacheStore {
 

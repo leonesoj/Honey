@@ -34,22 +34,30 @@ public class DurationUtil {
   public static String format(Duration duration) {
     long totalMillis = duration.toMillis();
 
-    long days = totalMillis / 86_400_000;
+    final long days = totalMillis / 86_400_000;
     totalMillis %= 86_400_000;
 
-    long hours = totalMillis / 3_600_000;
+    final long hours = totalMillis / 3_600_000;
     totalMillis %= 3_600_000;
 
-    long minutes = totalMillis / 60_000;
+    final long minutes = totalMillis / 60_000;
     totalMillis %= 60_000;
 
-    long seconds = totalMillis / 1_000;
-    long millis = totalMillis % 1_000;
+    final long seconds = totalMillis / 1_000;
+    final long millis = totalMillis % 1_000;
 
     StringBuilder sb = new StringBuilder();
-    if (days > 0) sb.append(days).append("d ");
-    if (hours > 0) sb.append(hours).append("h ");
-    if (minutes > 0) sb.append(minutes).append("m ");
+    if (days > 0) {
+      sb.append(days).append("d ");
+    }
+
+    if (hours > 0) {
+      sb.append(hours).append("h ");
+    }
+
+    if (minutes > 0) {
+      sb.append(minutes).append("m ");
+    }
 
     if (seconds > 0 || millis > 0 || sb.isEmpty()) {
       double totalSeconds = seconds + millis / 1000.0;

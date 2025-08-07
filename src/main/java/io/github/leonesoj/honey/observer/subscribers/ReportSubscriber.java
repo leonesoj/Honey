@@ -1,5 +1,7 @@
 package io.github.leonesoj.honey.observer.subscribers;
 
+import static io.github.leonesoj.honey.locale.Message.argComponent;
+
 import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.database.data.model.Report;
 import io.github.leonesoj.honey.observer.Observer;
@@ -8,8 +10,6 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.translation.Argument;
 import org.bukkit.Bukkit;
-
-import static io.github.leonesoj.honey.locale.Message.argComponent;
 
 public class ReportSubscriber implements Observer<Report> {
 

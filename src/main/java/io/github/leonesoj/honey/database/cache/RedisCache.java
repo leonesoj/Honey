@@ -17,8 +17,6 @@ import java.util.concurrent.CompletionException;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 
 public class RedisCache extends CacheStore {
 

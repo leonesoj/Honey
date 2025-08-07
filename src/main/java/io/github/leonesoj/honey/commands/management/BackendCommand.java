@@ -7,7 +7,6 @@ import io.github.leonesoj.honey.Honey;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 
 public class BackendCommand {
 

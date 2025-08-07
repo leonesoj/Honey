@@ -1,5 +1,8 @@
 package io.github.leonesoj.honey.commands.essentials.player;
 
+import static io.github.leonesoj.honey.locale.Message.argComponent;
+import static io.github.leonesoj.honey.locale.Message.prefixed;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -9,9 +12,6 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import org.bukkit.entity.Player;
-
-import static io.github.leonesoj.honey.locale.Message.prefixed;
-import static io.github.leonesoj.honey.locale.Message.argComponent;
 
 public class FlyCommand {
 
