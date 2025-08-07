@@ -1,5 +1,7 @@
 package io.github.leonesoj.honey.inventories;
 
+import static io.github.leonesoj.honey.locale.Message.prefixed;
+
 import com.destroystokyo.paper.profile.PlayerProfile;
 import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.database.data.model.Report;
@@ -14,8 +16,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-
-import static io.github.leonesoj.honey.locale.Message.prefixed;
 
 public class ReportViewInventory extends ReactiveInventory<Report> {
 

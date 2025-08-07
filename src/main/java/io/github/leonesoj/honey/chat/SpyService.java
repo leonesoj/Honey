@@ -25,7 +25,7 @@ public class SpyService implements Listener {
   private final Set<UUID> globalSpies = ConcurrentHashMap.newKeySet();
   private final Map<UUID, Set<UUID>> spySubjects = new HashMap<>();
 
-  private final static MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
+  private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
   public SpyService() {
     Bukkit.getPluginManager().registerEvents(this, Honey.getInstance());

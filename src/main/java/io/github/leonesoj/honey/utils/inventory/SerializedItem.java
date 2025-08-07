@@ -24,7 +24,8 @@ public record SerializedItem(int slot, ItemBuilder item, Sound clickSound,
     org.bukkit.Sound sound = null;
     if (section.getString("sound") != null) {
       sound = Registry.SOUND_EVENT.get(
-          NamespacedKey.fromString(section.getString( "sound")));
+          NamespacedKey.fromString(section.getString("sound"))
+      );
     }
 
     return new SerializedItem(section.getInt("slot", -1),

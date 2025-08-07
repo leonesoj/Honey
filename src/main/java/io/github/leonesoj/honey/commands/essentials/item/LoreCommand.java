@@ -1,5 +1,7 @@
 package io.github.leonesoj.honey.commands.essentials.item;
 
+import static io.github.leonesoj.honey.locale.Message.prefixed;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -14,8 +16,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.translation.Argument;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import static io.github.leonesoj.honey.locale.Message.prefixed;
 
 public class LoreCommand {
 

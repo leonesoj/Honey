@@ -7,10 +7,8 @@ import io.github.leonesoj.honey.utils.other.DurationUtil;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
@@ -146,12 +144,6 @@ public class ChatService implements Listener {
     return null;
   }
 
-  public Set<ChatChannel> getListeningOf(Audience audience) {
-    return channels.values().stream()
-        .filter(channel -> channel.hasListener(audience))
-        .collect(Collectors.toSet());
-  }
-
   public Collection<ChatChannel> getChannels() {
     return channels.values();
   }
@@ -209,7 +201,6 @@ public class ChatService implements Listener {
         return;
       } else {
         chatChannel.slowParticipant(player.getUniqueId());
-        player.sendPlainMessage("you are slowed now");
       }
     }
 

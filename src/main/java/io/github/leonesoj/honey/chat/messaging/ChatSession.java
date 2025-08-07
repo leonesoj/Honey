@@ -4,21 +4,25 @@ import java.util.UUID;
 
 public class ChatSession {
 
-  private final UUID a;
-  private final UUID b;
+  private final UUID participantA;
+  private final UUID participantB;
 
-  public ChatSession(UUID a, UUID b) {
-    this.a = a;
-    this.b = b;
+  public ChatSession(UUID participantA, UUID participantB) {
+    this.participantA = participantA;
+    this.participantB = participantB;
   }
 
   public boolean involves(UUID uuid) {
-    return uuid.equals(a) || uuid.equals(b);
+    return uuid.equals(participantA) || uuid.equals(participantB);
   }
 
   public UUID getOther(UUID uuid) {
-    if (uuid.equals(a)) return b;
-    if (uuid.equals(b)) return a;
+    if (uuid.equals(participantA)) {
+      return participantB;
+    }
+    if (uuid.equals(participantB)) {
+      return participantA;
+    }
     throw new IllegalArgumentException("UUID not part of this session.");
   }
 

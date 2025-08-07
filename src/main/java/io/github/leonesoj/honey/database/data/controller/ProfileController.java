@@ -8,7 +8,6 @@ import io.github.leonesoj.honey.database.providers.DataStore;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
