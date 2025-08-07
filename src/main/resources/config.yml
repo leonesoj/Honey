@@ -74,6 +74,10 @@ chat:
       to_user: "<gray>(<i>You</i> » <recipient>):</gray> <white><message></white>"
       from_user: "<gray>(<sender> » <i>You</i>):</gray> <white><message></white>"
     max_chat_history: 150
+  spy:
+    format:
+      command: <gray><<light_purple>#</light_purple>> <player>:</gray> <command>
+      private_message: <gray><<aqua>✉</aqua>> (<player> » <recipient>):</gray> <message>
 
 
 staff_mode:
