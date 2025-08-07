@@ -21,7 +21,7 @@ public class SpyCommand {
     return Commands.literal("spy")
         .requires(stack -> stack.getSender() instanceof Player sender
             && sender.hasPermission("honey.moderation.socialspy"))
-        .then(Commands.argument("player", new OtherPlayerArgument())
+        .then(Commands.argument("player", new OtherPlayerArgument(true))
             .executes(SpyCommand::commandUsage))
         .build();
   }
