@@ -3,6 +3,7 @@ package io.github.leonesoj.honey;
 import io.github.leonesoj.honey.chat.ChatChannel;
 import io.github.leonesoj.honey.chat.ChatChannel.ChatChannelBuilder;
 import io.github.leonesoj.honey.chat.ChatService;
+import io.github.leonesoj.honey.chat.SpyService;
 import io.github.leonesoj.honey.chat.messaging.PrivateChatService;
 import io.github.leonesoj.honey.config.Config;
 import io.github.leonesoj.honey.config.ConfigHandler;
@@ -37,6 +38,8 @@ public final class Honey extends JavaPlugin {
 
   private PrivateChatService privateChatService;
 
+  private SpyService spyService;
+
   private TranslationHandler translationHandler;
 
   @Override
@@ -55,10 +58,12 @@ public final class Honey extends JavaPlugin {
 
     staffHandler = new StaffHandler(dataHandler.getStaffSessionController());
 
-    chatService = new ChatService();
+    spyService = new SpyService();
+
+    chatService = new ChatService(spyService);
     registerDefaultChannels();
 
-    privateChatService = new PrivateChatService();
+    privateChatService = new PrivateChatService(spyService);
 
     translationHandler = new TranslationHandler(this);
     translationHandler.load();
@@ -107,6 +112,10 @@ public final class Honey extends JavaPlugin {
 
   public PrivateChatService getPrivateChatService() {
     return privateChatService;
+  }
+
+  public SpyService getSpyService() {
+    return spyService;
   }
 
   public TranslationHandler getTranslationHandler() {

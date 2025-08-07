@@ -27,12 +27,14 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 public class ChatService implements Listener {
 
   private final ConcurrentHashMap<String, ChatChannel> channels = new ConcurrentHashMap<>();
-  private final ConcurrentHashMap<UUID, Set<String>> spies = new ConcurrentHashMap<>();
+
+  private final SpyService spyService;
 
   private ChatChannel defaultChannel;
   private Chat chat;
 
-  public ChatService() {
+  public ChatService(SpyService spyService) {
+    this.spyService = spyService;
     Bukkit.getPluginManager().registerEvents(this, Honey.getInstance());
     setupVaultChat();
   }
@@ -120,44 +122,9 @@ public class ChatService implements Listener {
     }
   }
 
-  public void addSpy(Audience audience) {
-    Optional<UUID> optional = audience.get(Identity.UUID);
-    if (optional.isEmpty()) {
-      throw new IllegalArgumentException("Audience must have a UUID");
-    }
-
-    spies.put(optional.get(),
-        getListeningOf(audience).stream()
-            .map(ChatChannel::getIdentifier)
-            .collect(Collectors.toSet())
-    );
-    channels.values().forEach(chatChannel -> chatChannel.addListener(audience));
-  }
-
-  public void removeSpy(Audience audience) {
-    Optional<UUID> optional = audience.get(Identity.UUID);
-    if (optional.isEmpty()) {
-      throw new IllegalArgumentException("Audience must have a UUID");
-    }
-
-    UUID uuid = optional.get();
-    if (!spies.containsKey(uuid)) {
-      throw new IllegalArgumentException(
-          "Audience must be added as a spy prior to calling this method");
-    }
-
-    Set<String> listeningOn = spies.get(uuid);
-    channels.values().forEach(chatChannel -> {
-      if (!listeningOn.contains(chatChannel.getIdentifier())) {
-        chatChannel.removeListener(audience);
-      }
-    });
-    spies.remove(uuid);
-  }
-
   public boolean isSpy(Audience audience) {
     Optional<UUID> optional = audience.get(Identity.UUID);
-    return optional.isPresent() && spies.containsKey(optional.get());
+    return optional.isPresent() && spyService.isGlobalSpy(optional.get());
   }
 
   public ChatChannel getMemberChannel(Audience audience) {
@@ -246,7 +213,9 @@ public class ChatService implements Listener {
       }
     }
 
-    event.viewers().removeIf(audience -> !chatChannel.hasMember(audience));
+    event.viewers().removeIf(audience ->
+        !chatChannel.hasMember(audience) && !isSpy(audience)
+    );
     event.renderer(HoneyChatRenderer.getInstance());
   }
 
