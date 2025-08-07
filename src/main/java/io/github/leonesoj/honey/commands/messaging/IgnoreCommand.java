@@ -19,7 +19,7 @@ public class IgnoreCommand {
     return Commands.literal("ignore")
         .requires(stack -> stack.getSender() instanceof Player sender
             && sender.hasPermission("honey.messaging.ignore"))
-        .then(Commands.argument("player", new OtherPlayerArgument())
+        .then(Commands.argument("player", new OtherPlayerArgument(true))
             .executes(IgnoreCommand::commandUsage))
         .build();
   }
@@ -28,11 +28,6 @@ public class IgnoreCommand {
       throws CommandSyntaxException {
     Player sender = (Player) ctx.getSource().getSender();
     Player target = ctx.getArgument("player", Player.class);
-
-    if (target.hasPermission("honey.management.staff")) {
-      sender.sendMessage(Component.translatable("honey.settings.ignore.staff"));
-      return Command.SINGLE_SUCCESS;
-    }
 
     SettingsController controller = Honey.getInstance().getDataHandler().getSettingsController();
     controller.getSettingsSync(sender.getUniqueId())

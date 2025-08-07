@@ -37,6 +37,22 @@ public class OtherPlayerArgument implements
       )
   );
 
+  private static final SimpleCommandExceptionType ERROR_STAFF = new SimpleCommandExceptionType(
+      MessageComponentSerializer.message().serialize(
+          Component.translatable("honey.command.target.staff")
+      )
+  );
+
+  private final boolean excludeStaff;
+
+  public OtherPlayerArgument(boolean excludeStaff) {
+    this.excludeStaff = excludeStaff;
+  }
+
+  public OtherPlayerArgument() {
+    this(false);
+  }
+
   @Override
   public Player parse(StringReader reader) {
     throw new UnsupportedOperationException("This method will never be called");
@@ -54,6 +70,10 @@ public class OtherPlayerArgument implements
     Player player = getNativeType().parse(reader).resolve(stack).getFirst();
     if (sender.getUniqueId().equals(player.getUniqueId())) {
       throw ERROR_SELF.create();
+    }
+
+    if (player.hasPermission("honey.management.staff") && excludeStaff) {
+      throw ERROR_STAFF.create();
     }
 
     return player;
