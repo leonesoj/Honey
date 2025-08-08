@@ -1,6 +1,7 @@
 package io.github.leonesoj.honey.inventories;
 
 import io.github.leonesoj.honey.Honey;
+import io.github.leonesoj.honey.commands.essentials.player.ReportCommand;
 import io.github.leonesoj.honey.utils.inventory.SerializedInventory;
 import io.github.leonesoj.honey.utils.inventory.SerializedItem;
 import io.github.leonesoj.honey.utils.inventory.SimpleInventory;
@@ -91,6 +92,9 @@ public class ReportInventory extends SerializedInventory {
               subject,
               item.otherData().getOrDefault("reason", "unspecified").toString()
           );
+          long cooldown =
+              Honey.getInstance().getConfig().getInt("reports.report_cooldown", 900) * 1000L;
+          ReportCommand.getCooldownService().addPlayer(player.getUniqueId(), cooldown);
           player.sendMessage(Component.translatable("honey.report.submitted"));
         });
       });
