@@ -79,9 +79,13 @@ chat:
       command: <gray><<light_purple>#</light_purple>> <player>:</gray> <command>
       private_message: <gray><<aqua>✉</aqua>> (<player> » <recipient>):</gray> <message>
 
-
 staff_mode:
   # Enable this as a safeguard against unexpected server crashes, where Honey would otherwise be
   # unable to restore a staff's player state prior to enabling staff mode.
   # You can safely disable this if preserving their inventories isn't a critical loss.
   persist-staff-data: true
+
+reports:
+  # Amount of time a user must wait before submitting another successful report in seconds.
+  # Default: 900s = 15m
+  report_cooldown: 900
