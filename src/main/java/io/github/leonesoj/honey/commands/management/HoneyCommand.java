@@ -1,20 +1,20 @@
 package io.github.leonesoj.honey.commands.management;
 
+import static io.github.leonesoj.honey.locale.Message.prefixed;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.leonesoj.honey.Honey;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import org.bukkit.entity.Player;
 
-public class BackendCommand {
+public class HoneyCommand {
 
   public static LiteralCommandNode<CommandSourceStack> create() {
-    return Commands.literal("backend")
-        .requires(stack -> stack.getSender() instanceof Player sender
-            && sender.hasPermission("honey.management.backend"))
-        .then(Commands.literal("config-reload").executes(BackendCommand::configReloadUsage))
+    return Commands.literal("honey")
+        .requires(stack -> stack.getSender().hasPermission("honey.admin"))
+        .then(Commands.literal("reload").executes(HoneyCommand::configReloadUsage))
         .build();
   }
 
@@ -24,7 +24,8 @@ public class BackendCommand {
         Honey.getInstance().config().getString("chat.channels.general.format")
     );
     Honey.getInstance().getTranslationHandler().load();
-    ctx.getSource().getSender().sendPlainMessage("Config's reloaded");
+    ctx.getSource().getSender().sendMessage(prefixed("honey.reload"));
     return Command.SINGLE_SUCCESS;
   }
+
 }
