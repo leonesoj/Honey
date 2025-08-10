@@ -11,6 +11,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.translation.Argument;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class ReportSubscriber implements Observer<Report> {
@@ -45,6 +46,7 @@ public class ReportSubscriber implements Observer<Report> {
       Player issuer = Bukkit.getPlayer(report.getIssuer());
       if (issuer != null) {
         issuer.sendMessage(Component.translatable("honey.report.resolved"));
+        issuer.playSound(issuer, Sound.ENTITY_ARROW_HIT_PLAYER, 1F, 0.5F);
       }
     }
   }
