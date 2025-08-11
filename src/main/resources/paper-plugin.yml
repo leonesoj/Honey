@@ -7,11 +7,6 @@ api-version: '1.21.8'
 loader: io.github.leonesoj.honey.HoneyLoader
 bootstrapper: io.github.leonesoj.honey.HoneyBootstrap
 dependencies:
-  bootstrap:
-    Apollo-Bukkit:
-      load: BEFORE
-      required: false
-      join-classpath: true
   server:
     LuckPerms:
       load: BEFORE
@@ -22,10 +17,6 @@ dependencies:
     ProtocolLib:
       load: BEFORE
       required: false
-    Apollo-Bukkit:
-      load: BEFORE
-      required: false
-      join-classpath: true
     PlaceholderAPI:
       load: BEFORE
       required: false
