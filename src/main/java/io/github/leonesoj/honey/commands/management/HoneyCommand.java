@@ -8,24 +8,47 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.leonesoj.honey.Honey;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import java.util.UUID;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class HoneyCommand {
 
   public static LiteralCommandNode<CommandSourceStack> create() {
     return Commands.literal("honey")
-        .requires(stack -> stack.getSender().hasPermission("honey.admin"))
+        .requires(stack -> stack.getSender() instanceof Player sender
+            && sender.hasPermission("honey.admin"))
         .then(Commands.literal("reload").executes(HoneyCommand::configReloadUsage))
         .build();
   }
 
   private static int configReloadUsage(CommandContext<CommandSourceStack> ctx) {
-    Honey.getInstance().getConfigHandler().reloadConfigs();
-    Honey.getInstance().getChatService().getChannel("general").setFormat(
-        Honey.getInstance().config().getString("chat.channels.general.format")
-    );
-    Honey.getInstance().getTranslationHandler().load();
-    ctx.getSource().getSender().sendMessage(prefixed("honey.reload"));
+    UUID playerUuid = ((Player) ctx.getSource().getSender()).getUniqueId();
+    Honey honey = Honey.getInstance();
+
+    honey.getConfigHandler().reloadConfigs()
+        .thenRun(() -> {
+          honey.getChatService().getChannel("general").setFormat(
+              honey.config().getString("chat.channels.general.format")
+          );
+          sendMessageAsync(playerUuid, prefixed("honey.reload"));
+        })
+        .exceptionally(throwable -> {
+          sendMessageAsync(playerUuid, prefixed("honey.reload.failed"));
+          return null;
+        });
+    honey.getTranslationHandler().load();
     return Command.SINGLE_SUCCESS;
+  }
+
+  private static void sendMessageAsync(UUID playerUuid, Component message) {
+    Bukkit.getGlobalRegionScheduler().run(Honey.getInstance(), scheduledTask -> {
+      Player player = Bukkit.getPlayer(playerUuid);
+      if (player != null) {
+        player.getScheduler().run(Honey.getInstance(), task -> player.sendMessage(message), null);
+      }
+    });
   }
 
 }

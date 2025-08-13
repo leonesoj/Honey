@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -55,17 +56,23 @@ public class Config {
     // }
   }
 
-  public void loadConfig() {
+  public CompletableFuture<Void> loadConfig() {
+    CompletableFuture<Void> future = new CompletableFuture<>();
     Bukkit.getAsyncScheduler().runNow(plugin, task -> {
       try {
-        config = YamlConfiguration.loadConfiguration(configFile);
-      } catch (IllegalArgumentException exception) {
+        YamlConfiguration cfg = new YamlConfiguration();
+        cfg.load(configFile);
+        config = cfg;
+        future.complete(null);
+      } catch (Exception exception) {
         plugin.getLogger().log(Level.SEVERE,
-            "Failed to load config file: %s.yml".formatted(configFile.getName()),
+            "Failed to load config file: %s".formatted(configFile.getName()),
             exception
         );
+        future.completeExceptionally(exception);
       }
     });
+    return future;
   }
 
   private void saveConfig() {

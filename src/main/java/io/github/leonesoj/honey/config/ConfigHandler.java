@@ -2,6 +2,7 @@ package io.github.leonesoj.honey.config;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -47,8 +48,12 @@ public class ConfigHandler {
     return configs.get("staff-items").getRawConfig();
   }
 
-  public void reloadConfigs() {
-    configs.values().forEach(Config::loadConfig);
+  public CompletableFuture<Void> reloadConfigs() {
+    CompletableFuture<?>[] futures = configs.values().stream()
+        .map(Config::loadConfig)
+        .toArray(CompletableFuture[]::new);
+
+    return CompletableFuture.allOf(futures);
   }
 
 }
