@@ -21,7 +21,6 @@
 - **Essential Commands** - Honey comes with a lean(but extended functionality) set of essential commands that are perfect for every type of Minecraft server.
 - **Player Settings** - Let your players customize their server preferences by turning on/off private messages, public chat, sound alerts, and also changing their own chat color.
 - **Punishment System** - A complete suite for managing your server bans, mutes, warnings, and kicks with added history tracking.
-- **Lunar Client Integration** - Pick and choose which mods you want Lunar client players to have access to with an easy-to-use GUI.
 - **Chat Control** - Filter out unwanted content, apply chat formats, track chat/private message logs, and enforce rules to keep your server community healthy.
 - **Reporting System** - Give power to your players with an intuitive reporting GUI, packaged with 24 ready-to-use report reasons/descriptions, making it easy for staff to review and respond efficiently.
 - **Player Messaging** - Private messages, social spy, ignore lists, sound alerts, and network-wide messaging support.
@@ -36,7 +35,6 @@
 - MySQL or MongoDB database
 - Redis Database(**required** when using Velocity)
   - [Upstash](https://upstash.com/) offers a very capable free plan, with affordable paid options if you need to scale.
-- [Apollo-Bukkit](https://github.com/LunarClient/Apollo/releases) for Lunar client integration
 - [Vault](https://www.spigotmc.org/resources/vault.34315/) for prefix/suffix placeholders in chat formatting.
 
 <h2><img src="https://minecraft.wiki/images/Honeycomb_Block_JE1_BE1.png?ff510" alt="Beenest item" width="45" /> For Server Owners</h2>
