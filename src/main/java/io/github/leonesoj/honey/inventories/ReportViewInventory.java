@@ -1,5 +1,6 @@
 package io.github.leonesoj.honey.inventories;
 
+import static io.github.leonesoj.honey.locale.Message.argComponent;
 import static io.github.leonesoj.honey.locale.Message.prefixed;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
@@ -115,7 +116,9 @@ public class ReportViewInventory extends ReactiveInventory<Report> {
       Honey.getInstance().getDataHandler().getReportController().deleteReport(report.getId())
           .thenAccept(result -> SchedulerUtil.getPlayerScheduler(player.getUniqueId(), p -> {
             if (result) {
-              p.sendMessage(prefixed("honey.report.deleted.success"));
+              p.sendMessage(prefixed("honey.report.deleted.success",
+                  argComponent("id", report.getId().toString().substring(0, 8)))
+              );
             } else {
               p.sendMessage(prefixed("honey.report.deleted.failure"));
             }
