@@ -17,10 +17,6 @@ repositories {
         name = 'sonatype'
         url = 'https://oss.sonatype.org/content/groups/public/'
     }
-    maven {
-        name = 'lunarclient'
-        url = 'https://repo.lunarclient.dev'
-    }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://repo.extendedclip.com/releases/' }
@@ -46,7 +42,6 @@ tasks {
         minecraftVersion '1.21.8'
         downloadPlugins {
             modrinth ('luckperms', 'v5.5.0-bukkit')
-            modrinth ('lunar-client-apollo', '1.1.8')
         }
     }
 }
