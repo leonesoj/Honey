@@ -35,7 +35,7 @@ public class SettingsInventory extends SerializedInventory {
   protected void buildContent() {
     InventoryDecorator.createLoadingScreen(getInventory());
 
-    controller.getSettings(uuid)
+    controller.getSettingsSync(uuid)
         .exceptionally(throwable -> {
           InventoryDecorator.createErrorScreen(this, null);
           return Optional.empty();

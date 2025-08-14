@@ -9,6 +9,7 @@ import io.github.leonesoj.honey.database.data.model.Report.ReportStatus;
 import io.github.leonesoj.honey.utils.inventory.ReactiveInventory;
 import io.github.leonesoj.honey.utils.inventory.SerializedItem;
 import io.github.leonesoj.honey.utils.inventory.SimpleInventory;
+import io.github.leonesoj.honey.utils.other.SchedulerUtil;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -112,13 +113,13 @@ public class ReportViewInventory extends ReactiveInventory<Report> {
       player.closeInventory();
 
       Honey.getInstance().getDataHandler().getReportController().deleteReport(report.getId())
-          .thenAccept(result -> {
+          .thenAccept(result -> SchedulerUtil.getPlayerScheduler(player.getUniqueId(), p -> {
             if (result) {
-              player.sendMessage(prefixed("honey.report.deleted.success"));
+              p.sendMessage(prefixed("honey.report.deleted.success"));
             } else {
-              player.sendMessage(prefixed("honey.report.deleted.failure"));
+              p.sendMessage(prefixed("honey.report.deleted.failure"));
             }
-          });
+          }));
     };
   }
 
