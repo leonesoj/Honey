@@ -63,7 +63,9 @@ public abstract class DataController<T extends DataModel> implements Listener {
         .exceptionally(throwable -> Optional.empty())
         .thenCompose(cachedResult -> {
           if (cachedResult.isPresent()) {
-            return completeOnMainThread(cachedResult);
+            CompletableFuture<Optional<T>> future = new CompletableFuture<>();
+            future.complete(cachedResult);
+            return future;
           }
 
           return data.query(container, index, uuid.toString(), recordDeserializer)
@@ -79,12 +81,7 @@ public abstract class DataController<T extends DataModel> implements Listener {
   }
 
   protected CompletableFuture<List<T>> getMany(String index, String value, int limit, int offset) {
-    return data.queryMany(container, index, value, limit, offset, recordDeserializer)
-        .thenCompose(list -> {
-          CompletableFuture<List<T>> future = new CompletableFuture<>();
-          Bukkit.getGlobalRegionScheduler().run(plugin, task -> future.complete(list));
-          return future;
-        });
+    return data.queryMany(container, index, value, limit, offset, recordDeserializer);
   }
 
   protected CompletableFuture<Boolean> create(UUID uuid, T model) {
