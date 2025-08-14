@@ -10,8 +10,27 @@ main:
   items:
     report_item:
       type: book
+      slot: -1
       display_name:
-        en-US: "Report"
+        en-US: "<red>Report:</red> <gray>{short-id}</gray>"
+      lore:
+        en-US:
+          - ""
+          - "<gray>Subject: </gray> <red>{subject}</red>"
+          - "<gray>Issuer:</gray> <green>{issuer}</green>"
+          - "<gray>Reason:</gray> <yellow>{reason}</yellow>"
+          - ""
+          - "<gray>Server:</gray> <yellow>{server}</yellow>"
+          - "<gray>Status:</gray> <yellow>{status}</yellow>"
+          - ""
+          - "<gold><i>Click to view more details</i></gold>"
+    exit_item:
+      type: barrier
+      slot: 49
+      display_name:
+        en-US: "<red>Exit</red>"
+        es-MX: "<red>Salir</red>"
+
 report_viewer:
   title:
     en-US: ""

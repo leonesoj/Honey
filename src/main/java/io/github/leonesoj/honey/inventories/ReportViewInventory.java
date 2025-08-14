@@ -9,6 +9,9 @@ import io.github.leonesoj.honey.database.data.model.Report.ReportStatus;
 import io.github.leonesoj.honey.utils.inventory.ReactiveInventory;
 import io.github.leonesoj.honey.utils.inventory.SerializedItem;
 import io.github.leonesoj.honey.utils.inventory.SimpleInventory;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
@@ -41,28 +44,30 @@ public class ReportViewInventory extends ReactiveInventory<Report> {
     SerializedItem subject = parseItem("subject");
     addItem(subject);
 
+    ZonedDateTime zonedDateTime = report.getTimestamp().atZone(ZoneId.systemDefault());
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm a");
+
     SerializedItem reportItem = parseItem("report_item");
     reportItem.item()
         .addPlaceHolder("short-id", Component.text(report.getId().toString().substring(0, 8)))
         .addPlaceHolder("long-id", Component.text(report.getId().toString()))
         .addPlaceHolder("reason", Component.text(report.getReason()))
         .addPlaceHolder("status", Component.text(report.getStatus().name()))
+        .addPlaceHolder("date", Component.text(zonedDateTime.format(formatter)))
         .addPlaceHolder("server", Component.text(report.getServer()));
     addItem(reportItem);
 
-    addItem(parseItem("mark_as_resolved"), event -> {
-
-    });
-    addItem(parseItem("mark_as_noted"));
+    if (report.getStatus().equals(ReportStatus.PENDING_REVIEW)) {
+      addItem(parseItem("mark_as_resolved"), changeReportStatus(ReportStatus.RESOLVED));
+      addItem(parseItem("mark_as_noted"), changeReportStatus(ReportStatus.NOTED));
+    }
 
     if (getParent() != null) {
       SerializedItem backItem = parseItem("back_item");
       addItem(backItem, event -> goToParent((Player) event.getWhoClicked()));
     }
 
-    addItem(parseItem("exit_item"),
-        event -> event.getWhoClicked().closeInventory()
-    );
+    addItem(parseItem("exit_item"), event -> event.getWhoClicked().closeInventory());
 
     addItem(parseItem("delete_item"), deleteReport());
 
@@ -92,6 +97,12 @@ public class ReportViewInventory extends ReactiveInventory<Report> {
     return event -> {
       report.setStatus(status);
       Honey.getInstance().getDataHandler().getReportController().updateReport(report);
+
+      int resolvedSlot = parseItem("mark_as_resolved").slot();
+      int notedSlot = parseItem("mark_as_noted").slot();
+      addItem(resolvedSlot, null);
+      addItem(notedSlot, null);
+      applyDecorator(false);
     };
   }
 

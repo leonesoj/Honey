@@ -70,7 +70,7 @@ public abstract class SerializedInventory extends SimpleInventory {
       );
       case "fill" -> InventoryDecorator.addFiller(getInventory(),
           new ItemBuilder(decoratorSection.getConfigurationSection("fill_item"), locale).build(),
-          true
+          force
       );
       case "none" -> {
       }
