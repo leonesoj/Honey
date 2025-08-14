@@ -54,7 +54,8 @@ public class ReportController extends DataController<Report> {
   }
 
   public CompletableFuture<List<Report>> getPendingReports(int limit, int offset) {
-    return getMany(Report.STATUS_FIELD, ReportStatus.PENDING_REVIEW.name(), limit, offset);
+    return getMany(Report.STATUS_FIELD, ReportStatus.PENDING_REVIEW.name(), limit, offset)
+        .thenCompose(this::completeOnMainThread);
   }
 
   public CompletableFuture<Optional<Report>> getReport(UUID uuid) {
