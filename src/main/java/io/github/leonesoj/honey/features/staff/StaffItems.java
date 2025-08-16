@@ -79,8 +79,6 @@ public class StaffItems implements Listener {
 
   @EventHandler
   public void onItemDrag(InventoryDragEvent event) {
-    event.getWhoClicked()
-        .sendMessage(Component.text(event.getOldCursor().getType().name(), NamedTextColor.RED));
     if (staffHandler.isInStaffMode(event.getWhoClicked().getUniqueId())) {
       event.setCancelled(true);
     }
