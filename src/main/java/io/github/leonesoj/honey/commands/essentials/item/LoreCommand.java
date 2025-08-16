@@ -52,7 +52,7 @@ public class LoreCommand {
   }
 
   private static int setUsage(CommandContext<CommandSourceStack> ctx) {
-    int lineNumber = ctx.getArgument("line_number", Integer.class);
+    int lineNumber = ctx.getArgument("line_number", Integer.class) - 1;
     Component loreLine = ctx.getArgument("lore", Component.class);
     Player sender = (Player) ctx.getSource().getSender();
 
@@ -61,8 +61,9 @@ public class LoreCommand {
     List<Component> lore = getLore(item);
     if (lineNumber < lore.size()) {
       lore.set(lineNumber, loreLine);
+      item.lore(lore);
       sender.sendMessage(prefixed("honey.lore.set",
-          Argument.component("line_number", Component.text(lineNumber))
+          Argument.component("line_number", Component.text(lineNumber + 1))
       ));
     } else {
       sender.sendMessage(prefixed("honey.lore.failure"));
@@ -72,16 +73,16 @@ public class LoreCommand {
   }
 
   private static int removeUsage(CommandContext<CommandSourceStack> ctx) {
-    int lineNumber = ctx.getArgument("line_number", Integer.class);
+    int lineNumber = ctx.getArgument("line_number", Integer.class) - 1;
     Player sender = (Player) ctx.getSource().getSender();
 
     ItemStack item = sender.getInventory().getItemInMainHand();
 
     List<Component> lore = getLore(item);
     if (lineNumber <= lore.size()) {
-      lore.remove(lineNumber - 1);
+      lore.remove(lineNumber);
       sender.sendMessage(prefixed("honey.lore.remove",
-          Argument.component("line_number", Component.text(lineNumber))
+          Argument.component("line_number", Component.text(lineNumber + 1))
       ));
     } else {
       sender.sendMessage(prefixed("honey.lore.failure"));
