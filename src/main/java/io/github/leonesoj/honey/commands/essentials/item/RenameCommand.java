@@ -7,6 +7,7 @@ import io.github.leonesoj.honey.utils.command.MiniMessageArgument;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -26,9 +27,15 @@ public class RenameCommand {
     Component displayName = ctx.getArgument("display_name", Component.class);
 
     ItemStack heldItem = sender.getInventory().getItemInMainHand();
-    heldItem.editMeta(meta -> meta.displayName(displayName));
-
-    sender.sendMessage(Component.translatable("honey.rename"));
+    if (!heldItem.isEmpty()) {
+      heldItem.editMeta(meta -> {
+        if (!displayName.hasDecoration(TextDecoration.ITALIC)) {
+          meta.customName(displayName.decoration(TextDecoration.ITALIC, false));
+        } else {
+          meta.customName(displayName);
+        }
+      });
+    }
     return Command.SINGLE_SUCCESS;
   }
 
