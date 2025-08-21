@@ -4,7 +4,6 @@ import static io.github.leonesoj.honey.locale.Message.argComponent;
 import static io.github.leonesoj.honey.locale.Message.prefixed;
 
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
@@ -12,6 +11,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.database.data.controller.ProfileController;
 import io.github.leonesoj.honey.database.data.model.PlayerProfile;
+import io.github.leonesoj.honey.utils.command.ValidUsernameArgument;
 import io.github.leonesoj.honey.utils.other.DurationUtil;
 import io.github.leonesoj.honey.utils.other.OfflinePlayerUtil;
 import io.github.leonesoj.honey.utils.other.SchedulerUtil;
@@ -37,14 +37,14 @@ public class WhoIsCommand {
     return Commands.literal("whois")
         .requires(stack -> stack.getSender() instanceof Player sender
             && sender.hasPermission("honey.management.whois"))
-        .then(Commands.argument("player", StringArgumentType.word())
+        .then(Commands.argument("player", new ValidUsernameArgument())
             .suggests(WhoIsCommand::getSuggestions)
             .executes(WhoIsCommand::commandUsage))
         .build();
   }
 
   private static int commandUsage(CommandContext<CommandSourceStack> ctx) {
-    String target = StringArgumentType.getString(ctx, "player");
+    String target = ctx.getArgument("player", String.class);
     UUID playerUUID = ((Player) ctx.getSource().getSender()).getUniqueId();
 
     OfflinePlayerUtil.getAsyncOfflinePlayer(target, offlinePlayer -> {
