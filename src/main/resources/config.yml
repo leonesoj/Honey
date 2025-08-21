@@ -89,3 +89,9 @@ reports:
   # Amount of time a user must wait before submitting another successful report in seconds.
   # Default: 900s = 15m
   report_cooldown: 900
+
+# At first startup, a secret key will automatically be generated, DO NOT change this value
+# under any circumstances as various features will break.
+# This secret key is used for hashing purposes to keep your player's sensitive information hidden
+# in the case of a database breach.
+secret: ""

@@ -4,6 +4,7 @@ import io.github.leonesoj.honey.database.cache.CacheProvider;
 import io.github.leonesoj.honey.database.cache.CacheStore;
 import io.github.leonesoj.honey.database.cache.InMemoryCache;
 import io.github.leonesoj.honey.database.cache.RedisCache;
+import io.github.leonesoj.honey.database.data.controller.ProfileController;
 import io.github.leonesoj.honey.database.data.controller.ReportController;
 import io.github.leonesoj.honey.database.data.controller.SettingsController;
 import io.github.leonesoj.honey.database.data.controller.StaffSessionController;
@@ -25,6 +26,7 @@ public class DataHandler {
   private final CacheStore cache;
 
   private final SettingsController settingsController;
+  private final ProfileController profileController;
   private final StaffSessionController staffSessionController;
   private final ReportController reportController;
 
@@ -37,12 +39,17 @@ public class DataHandler {
     this.cache = initCacheProvider(cacheProvider, redisConfig);
 
     this.settingsController = new SettingsController(dataStore, cache);
+    this.profileController = new ProfileController(dataStore, false);
     this.staffSessionController = new StaffSessionController(cache);
     this.reportController = new ReportController(dataStore);
   }
 
   public SettingsController getSettingsController() {
     return settingsController;
+  }
+
+  public ProfileController getProfileController() {
+    return profileController;
   }
 
   public ReportController getReportController() {

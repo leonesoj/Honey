@@ -12,6 +12,7 @@ import java.util.UUID;
 public class PlayerProfile implements DataModel {
 
   private static final String UUID_FIELD = "uuid";
+  private static final String HASHED_IP_FIELD = "hashed_ip";
   private static final String LAST_SEEN_FIELD = "last_seen";
   private static final String FIRST_SEEN_FIELD = "first_seen";
   private static final String PLAY_TIME_FIELD = "play_time";
@@ -22,13 +23,15 @@ public class PlayerProfile implements DataModel {
 
   public static final Map<String, FieldType> SCHEMA = Map.of(
       UUID_FIELD, FieldType.UUID,
+      HASHED_IP_FIELD, FieldType.STRING,
       LAST_SEEN_FIELD, FieldType.INSTANT,
       FIRST_SEEN_FIELD, FieldType.INSTANT,
-      PLAY_TIME_FIELD, FieldType.INTEGER,
+      PLAY_TIME_FIELD, FieldType.DURATION,
       LAST_CONNECTED_FIELD, FieldType.STRING
   );
 
   private final UUID uuid;
+  private final String hashedIp;
 
   private final Instant firstSeen;
   private Instant lastSeen;
@@ -36,9 +39,10 @@ public class PlayerProfile implements DataModel {
 
   private String lastConnected;
 
-  public PlayerProfile(UUID uuid, Instant lastSeen, Instant firstSeen, Duration playTime,
-      String lastConnected) {
+  public PlayerProfile(UUID uuid, String hashedIp, Instant lastSeen, Instant firstSeen,
+      Duration playTime, String lastConnected) {
     this.uuid = uuid;
+    this.hashedIp = hashedIp;
     this.lastSeen = lastSeen;
     this.firstSeen = firstSeen;
     this.playTime = playTime;
@@ -47,6 +51,10 @@ public class PlayerProfile implements DataModel {
 
   public UUID getUuid() {
     return uuid;
+  }
+
+  public String getHashedIp() {
+    return hashedIp;
   }
 
   public Instant getFirstSeen() {
@@ -60,7 +68,6 @@ public class PlayerProfile implements DataModel {
   public void setLastSeen(Instant lastSeen) {
     this.lastSeen = lastSeen;
   }
-
 
   public Duration getPlayTime() {
     return playTime;
@@ -82,9 +89,10 @@ public class PlayerProfile implements DataModel {
   public Map<String, Object> serialize() {
     return Map.of(
         UUID_FIELD, uuid.toString(),
+        HASHED_IP_FIELD, hashedIp,
         LAST_SEEN_FIELD, lastSeen,
         FIRST_SEEN_FIELD, firstSeen,
-        PLAY_TIME_FIELD, playTime,
+        PLAY_TIME_FIELD, playTime.toMillis(),
         LAST_CONNECTED_FIELD, lastConnected
     );
   }
@@ -92,6 +100,7 @@ public class PlayerProfile implements DataModel {
   public static PlayerProfile deserialize(DataRecord record) {
     return new PlayerProfile(
         record.get(UUID_FIELD, SCHEMA.get(UUID_FIELD)),
+        record.get(HASHED_IP_FIELD, SCHEMA.get(HASHED_IP_FIELD)),
         record.get(LAST_SEEN_FIELD, SCHEMA.get(LAST_SEEN_FIELD)),
         record.get(FIRST_SEEN_FIELD, SCHEMA.get(FIRST_SEEN_FIELD)),
         record.get(PLAY_TIME_FIELD, SCHEMA.get(PLAY_TIME_FIELD)),
