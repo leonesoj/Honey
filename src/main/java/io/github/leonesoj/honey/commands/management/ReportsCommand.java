@@ -3,12 +3,12 @@ package io.github.leonesoj.honey.commands.management;
 import static io.github.leonesoj.honey.locale.Message.prefixed;
 
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.inventories.ReportViewInventory;
 import io.github.leonesoj.honey.inventories.ReportsInventory;
+import io.github.leonesoj.honey.utils.command.ValidUsernameArgument;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
@@ -24,7 +24,7 @@ public class ReportsCommand {
             && sender.hasPermission("honey.management.reports"))
         .then(Commands.argument("id", ArgumentTypes.uuid())
             .executes(ReportsCommand::withIdUsage))
-        .then(Commands.argument("player", StringArgumentType.word()))
+        .then(Commands.argument("player", new ValidUsernameArgument()))
         .executes(ReportsCommand::commandUsage)
         .build();
   }

@@ -2,9 +2,9 @@ package io.github.leonesoj.honey.commands.essentials.item;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.github.leonesoj.honey.utils.command.ValidUsernameArgument;
 import io.github.leonesoj.honey.utils.item.HeadUtils;
 import io.github.leonesoj.honey.utils.item.ItemBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -23,7 +23,7 @@ public class SkullCommand {
         .requires(stack -> stack.getSender() instanceof Player sender
             && sender.hasPermission("honey.item.skull"))
         .executes(SkullCommand::commandUsage)
-        .then(Commands.argument("player", StringArgumentType.word())
+        .then(Commands.argument("player", new ValidUsernameArgument())
             .executes(SkullCommand::targetUsage))
         .build();
   }

@@ -1,11 +1,11 @@
 package io.github.leonesoj.honey.commands.messaging;
 
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.database.data.controller.SettingsController;
+import io.github.leonesoj.honey.utils.command.ValidUsernameArgument;
 import io.github.leonesoj.honey.utils.other.OfflinePlayerUtil;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -19,7 +19,7 @@ public class UnignoreCommand {
     return Commands.literal("unignore")
         .requires(stack -> stack.getSender() instanceof Player sender
             && sender.hasPermission("honey.messaging.ignore"))
-        .then(Commands.argument("player", StringArgumentType.word())
+        .then(Commands.argument("player", new ValidUsernameArgument())
             .executes(UnignoreCommand::commandUsage))
         .build();
   }
