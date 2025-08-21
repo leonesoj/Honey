@@ -11,6 +11,7 @@ import io.github.leonesoj.honey.database.DataHandler;
 import io.github.leonesoj.honey.features.serverlisting.ServerListing;
 import io.github.leonesoj.honey.features.staff.StaffHandler;
 import io.github.leonesoj.honey.locale.TranslationHandler;
+import io.github.leonesoj.honey.secret.SecretHandler;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
@@ -42,6 +43,8 @@ public final class Honey extends JavaPlugin {
 
   private TranslationHandler translationHandler;
 
+  private SecretHandler secretHandler;
+
   @Override
   public void onEnable() {
     instance = this;
@@ -55,6 +58,9 @@ public final class Honey extends JavaPlugin {
         getConfig().getString("cache.provider"),
         getConfig().getConfigurationSection("cache.redis_config")
     );
+
+    secretHandler = new SecretHandler(this);
+    secretHandler.generateSecret();
 
     staffHandler = new StaffHandler(dataHandler.getStaffSessionController());
 
@@ -122,9 +128,13 @@ public final class Honey extends JavaPlugin {
     return translationHandler;
   }
 
+  public SecretHandler getSecretHandler() {
+    return secretHandler;
+  }
+
   public void registerServerLinks() {
     config().getRawConfig().getConfigurationSection("server")
-        .getConfigurationSection("links").getValues(false).forEach((entry, value) -> {
+      .getConfigurationSection("links").getValues(false).forEach((entry, value) -> {
           ConfigurationSection section = (ConfigurationSection) value;
           try {
             Bukkit.getServerLinks().addLink(

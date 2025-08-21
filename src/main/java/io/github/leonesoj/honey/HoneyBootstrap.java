@@ -23,6 +23,7 @@ import io.github.leonesoj.honey.commands.essentials.world.OverworldCommand;
 import io.github.leonesoj.honey.commands.essentials.world.TheEndCommand;
 import io.github.leonesoj.honey.commands.management.HoneyCommand;
 import io.github.leonesoj.honey.commands.management.ReportsCommand;
+import io.github.leonesoj.honey.commands.management.WhoIsCommand;
 import io.github.leonesoj.honey.commands.messaging.ChannelCommand;
 import io.github.leonesoj.honey.commands.messaging.IgnoreCommand;
 import io.github.leonesoj.honey.commands.messaging.MessageCommand;
@@ -80,6 +81,7 @@ public class HoneyBootstrap implements PluginBootstrap {
       /* MANAGEMENT COMMANDS */
       commands.registrar().register(HoneyCommand.create());
       commands.registrar().register(ReportsCommand.create());
+      commands.registrar().register(WhoIsCommand.create());
 
       /* MODERATION COMMANDS */
       commands.registrar().register(BanCommand.create());
