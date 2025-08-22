@@ -45,13 +45,13 @@ public class WhoIsCommand {
 
   private static int commandUsage(CommandContext<CommandSourceStack> ctx) {
     String target = ctx.getArgument("player", String.class);
-    UUID playerUUID = ((Player) ctx.getSource().getSender()).getUniqueId();
+    UUID playerUuid = ((Player) ctx.getSource().getSender()).getUniqueId();
 
     OfflinePlayerUtil.getAsyncOfflinePlayer(target, offlinePlayer -> {
       ProfileController controller = Honey.getInstance().getDataHandler().getProfileController();
 
       controller.getPlayerProfile(offlinePlayer.getUniqueId())
-          .thenAccept(optional -> SchedulerUtil.getPlayerScheduler(playerUUID, player -> {
+          .thenAccept(optional -> SchedulerUtil.getPlayerScheduler(playerUuid, player -> {
             if (optional.isPresent()) {
               PlayerProfile profile = optional.get();
 
