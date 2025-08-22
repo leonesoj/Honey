@@ -34,10 +34,11 @@ public class ReportCommand {
     UUID senderUuid = sender.getUniqueId();
 
     if (cooldownService.hasCooldown(senderUuid)) {
-      sender.sendMessage(Component.translatable("honey.command.cooldown",
-              argComponent("duration", DurationUtil.format(cooldownService.getRemaining(senderUuid)))
-          )
-      );
+      sender.sendMessage(
+          Component.translatable("honey.command.cooldown",
+              argComponent("duration",
+                  DurationUtil.format(cooldownService.getRemaining(senderUuid)))
+          ));
       return Command.SINGLE_SUCCESS;
     }
 

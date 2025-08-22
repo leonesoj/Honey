@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 public class SchedulerUtil {
 
-  private SchedulerUtil(){
+  private SchedulerUtil() {
   }
 
   public static void getPlayerScheduler(UUID playerUuid, Consumer<Player> consumer) {

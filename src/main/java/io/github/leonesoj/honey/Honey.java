@@ -134,7 +134,7 @@ public final class Honey extends JavaPlugin {
 
   public void registerServerLinks() {
     config().getRawConfig().getConfigurationSection("server")
-      .getConfigurationSection("links").getValues(false).forEach((entry, value) -> {
+        .getConfigurationSection("links").getValues(false).forEach((entry, value) -> {
           ConfigurationSection section = (ConfigurationSection) value;
           try {
             Bukkit.getServerLinks().addLink(
