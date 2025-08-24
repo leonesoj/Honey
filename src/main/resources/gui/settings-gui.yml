@@ -18,7 +18,13 @@ main:
         es-MX: "<aqua>Mensajes de Chat</aqua>"
       lore:
         en-US:
+          - "<gray>Toggle whether or not you want</gray>"
+          - "<gray>to see <i>public</i> chat message</gray>"
+          - ""
           - "<gray>Currently:</gray> %status%"
+          - ""
+          - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
     private_messages:
       type: enchanted_book
       slot: 12
@@ -27,16 +33,29 @@ main:
         es-MX: "<light_purple>Mensajes Privados</light_purple>"
       lore:
         en-US:
+          - "<gray>Toggle whether or not you want</gray>"
+          - "<gray>to see <i>private</i> chat message</gray>"
+          - ""
           - "<gray>Currently:</gray> %status%"
+          - ""
+          - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
+      glint: true
     profanity_filter:
-      type: lectern
+      type: anvil
       slot: 14
       display_name:
         en-US: "<red>Profanity Filter</red>"
         es-MX: "<red>Filtro Profano</red>"
       lore:
         en-US:
+          - "<gray>Filter out inappropriate language</gray>"
+          - "<gray>from your public and private chat</gray>"
+          - ""
           - "<gray>Currently:</gray> %status%"
+          - ""
+          - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
     sound_alerts:
       type: note_block
       slot: 16
@@ -45,4 +64,11 @@ main:
         es-MX: "<gold>Alertas de Sonido</gold>"
       lore:
         en-US:
+          - "<gray>Toggle whether or not you want</gray>"
+          - "<gray>to be pinged when your name is</gray>"
+          - "<gray>mentioned in general chat</gray>"
+          - ""
           - "<gray>Currently:</gray> %status%"
+          - ""
+          - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
