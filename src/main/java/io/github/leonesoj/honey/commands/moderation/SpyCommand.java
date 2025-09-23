@@ -33,7 +33,7 @@ public class SpyCommand {
     UUID senderId = sender.getUniqueId();
     UUID targetId = target.getUniqueId();
 
-    SpyService spyService = Honey.getInstance().getSpyService();
+    SpyService spyService = Honey.getInstance().getStaffHandler().getSpyService();
 
     Set<UUID> currentTargets = spyService.getTargetsOfSpy(senderId);
     if (!currentTargets.contains(targetId)) {

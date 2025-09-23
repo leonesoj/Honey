@@ -29,7 +29,7 @@ public class ReplyCommand {
     Player sender = (Player) ctx.getSource().getSender();
     String message = ctx.getArgument("message", String.class);
 
-    PrivateChatService chatService = Honey.getInstance().getPrivateChatService();
+    PrivateChatService chatService = Honey.getInstance().getChatService().getPrivateChatService();
     UUID lastContactUuid = chatService.getLastContact(sender.getUniqueId());
 
     if (lastContactUuid == null) {

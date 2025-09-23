@@ -23,7 +23,9 @@ public class SocialSpyCommand {
   private static int commandUsage(CommandContext<CommandSourceStack> ctx) {
     Player sender = (Player) ctx.getSource().getSender();
 
-    boolean newStatus = Honey.getInstance().getSpyService().toggleGlobalSpy(sender.getUniqueId());
+    boolean newStatus = Honey.getInstance().getStaffHandler()
+        .getSpyService()
+        .toggleGlobalSpy(sender.getUniqueId());
     if (newStatus) {
       sender.sendMessage(prefixed("honey.socialspy.enabled"));
     } else {

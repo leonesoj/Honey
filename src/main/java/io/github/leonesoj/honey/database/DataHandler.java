@@ -7,7 +7,7 @@ import io.github.leonesoj.honey.database.cache.RedisCache;
 import io.github.leonesoj.honey.database.data.controller.ProfileController;
 import io.github.leonesoj.honey.database.data.controller.ReportController;
 import io.github.leonesoj.honey.database.data.controller.SettingsController;
-import io.github.leonesoj.honey.database.data.controller.StaffSessionController;
+import io.github.leonesoj.honey.database.data.controller.StaffSettingsController;
 import io.github.leonesoj.honey.database.providers.DataProvider;
 import io.github.leonesoj.honey.database.providers.DataStore;
 import io.github.leonesoj.honey.database.providers.MongoData;
@@ -27,7 +27,7 @@ public class DataHandler {
 
   private final SettingsController settingsController;
   private final ProfileController profileController;
-  private final StaffSessionController staffSessionController;
+  private final StaffSettingsController staffSettingsController;
   private final ReportController reportController;
 
   public DataHandler(JavaPlugin plugin, String databaseProvider,
@@ -40,7 +40,7 @@ public class DataHandler {
 
     this.settingsController = new SettingsController(dataStore, cache);
     this.profileController = new ProfileController(dataStore, false);
-    this.staffSessionController = new StaffSessionController(cache);
+    this.staffSettingsController = new StaffSettingsController(dataStore, cache);
     this.reportController = new ReportController(dataStore);
   }
 
@@ -56,8 +56,8 @@ public class DataHandler {
     return reportController;
   }
 
-  public StaffSessionController getStaffSessionController() {
-    return staffSessionController;
+  public StaffSettingsController getStaffSettingsController() {
+    return staffSettingsController;
   }
 
   private DataStore initHoneyData(String databaseProvider) {

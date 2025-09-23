@@ -11,6 +11,7 @@ items:
       en-US: "<green>Random Teleport</green>"
       es-MX: ""
     slot: 1
+    glint: true
   follow_player:
     type: lead
     display_name:
@@ -20,10 +21,10 @@ items:
   vanish:
     type: lime_dye
     display_name:
-      en-US: "<light_purple>Vanish</light_purple>"
+      en-US: "<light_purple>Vanish</light_purple> <gray>:</gray> {status}"
       es-MX: ""
     slot: 8
     other_data:
       disabled_type: gray_dye
       enabled_text: "<green>Enabled</green>"
-      disabled_text: "<red>>Disabled</red>"
+      disabled_text: "<red>Disabled</red>"

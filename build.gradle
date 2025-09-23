@@ -42,7 +42,7 @@ tasks {
         minecraftVersion '1.21.8'
         downloadPlugins {
             modrinth ('luckperms', 'v5.5.0-bukkit')
-            github ("MilkBowl", "Vault", "1.7.3", "Vault.jar")
+            github ('MilkBowl', 'Vault', '1.7.3', 'Vault.jar')
         }
     }
 }

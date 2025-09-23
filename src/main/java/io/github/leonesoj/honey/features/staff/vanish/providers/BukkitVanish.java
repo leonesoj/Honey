@@ -1,4 +1,4 @@
-package io.github.leonesoj.honey.utils.vanish;
+package io.github.leonesoj.honey.features.staff.vanish.providers;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;

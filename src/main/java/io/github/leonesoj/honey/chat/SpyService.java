@@ -32,12 +32,23 @@ public class SpyService implements Listener {
   }
 
   public boolean toggleGlobalSpy(UUID uuid) {
-    if (globalSpies.contains(uuid)) {
-      globalSpies.remove(uuid);
-      return false;
-    } else {
+    boolean isSpying = globalSpies.contains(uuid);
+    setSpyStatus(uuid, !isSpying);
+
+    Honey.getInstance().getDataHandler().getStaffSettingsController()
+        .modifySettings(uuid, staffSettings -> {
+          staffSettings.setSocialSpy(!isSpying);
+          return staffSettings;
+        });
+
+    return !isSpying;
+  }
+
+  public void setSpyStatus(UUID uuid, boolean status) {
+    if (status) {
       globalSpies.add(uuid);
-      return true;
+    } else {
+      globalSpies.remove(uuid);
     }
   }
 
