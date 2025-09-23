@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -83,13 +84,13 @@ public class ReportViewInventory extends ReactiveInventory<Report> {
       subject.item()
           .asPlayerHead(subjectPlayer, subjectProfile)
           .addPlaceHolder("name", subjectPlayer.getName())
-          .addPlaceHolder("status", Boolean.toString(subjectPlayer.isOnline()));
+          .addPlaceHolder("status", fancyStatus(subjectPlayer.isOnline()));
       addItem(subject);
 
       issuer.item()
           .asPlayerHead(issuerPlayer, issuerProfile)
           .addPlaceHolder("name", issuerPlayer.getName())
-          .addPlaceHolder("status", Boolean.toString(subjectPlayer.isOnline()));
+          .addPlaceHolder("status", fancyStatus(issuerPlayer.isOnline()));
       addItem(issuer);
     });
 
@@ -124,6 +125,11 @@ public class ReportViewInventory extends ReactiveInventory<Report> {
             }
           }));
     };
+  }
+
+  private Component fancyStatus(boolean online) {
+    return online ? Component.text("online").color(NamedTextColor.GREEN)
+        : Component.text("offline").color(NamedTextColor.RED);
   }
 
   private PlayerProfile getProfile(OfflinePlayer player) {

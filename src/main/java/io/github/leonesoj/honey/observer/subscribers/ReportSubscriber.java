@@ -20,8 +20,8 @@ public class ReportSubscriber implements Observer<Report> {
   public void onCreate(Report report) {
     Bukkit.getOnlinePlayers().forEach(player -> {
       if (player.hasPermission("honey.management.staff")) {
-        Honey.getInstance().getStaffHandler().getSessionController()
-            .getOrCreateSession(player.getUniqueId())
+        Honey.getInstance().getDataHandler().getStaffSettingsController()
+            .getSettingsSync(player.getUniqueId())
             .thenAccept(optional -> optional.ifPresent(staffSession -> {
               if (staffSession.hasReportAlerts()) {
                 player.sendMessage(

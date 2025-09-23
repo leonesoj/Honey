@@ -3,6 +3,7 @@ package io.github.leonesoj.honey.chat;
 import static io.github.leonesoj.honey.locale.Message.argComponent;
 
 import io.github.leonesoj.honey.Honey;
+import io.github.leonesoj.honey.chat.messaging.PrivateChatService;
 import io.github.leonesoj.honey.utils.other.DurationUtil;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import java.util.Collection;
@@ -26,6 +27,7 @@ public class ChatService implements Listener {
 
   private final ConcurrentHashMap<String, ChatChannel> channels = new ConcurrentHashMap<>();
 
+  private final PrivateChatService privateChatService;
   private final SpyService spyService;
 
   private ChatChannel defaultChannel;
@@ -33,6 +35,7 @@ public class ChatService implements Listener {
 
   public ChatService(SpyService spyService) {
     this.spyService = spyService;
+    this.privateChatService = new PrivateChatService(spyService);
     Bukkit.getPluginManager().registerEvents(this, Honey.getInstance());
     setupVaultChat();
   }
@@ -150,6 +153,10 @@ public class ChatService implements Listener {
 
   public ChatChannel getChannel(String channelName) {
     return channels.get(channelName);
+  }
+
+  public PrivateChatService getPrivateChatService() {
+    return privateChatService;
   }
 
   @EventHandler

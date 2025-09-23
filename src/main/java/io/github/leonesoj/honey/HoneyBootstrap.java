@@ -31,6 +31,7 @@ import io.github.leonesoj.honey.commands.messaging.ReplyCommand;
 import io.github.leonesoj.honey.commands.messaging.UnignoreCommand;
 import io.github.leonesoj.honey.commands.moderation.BanCommand;
 import io.github.leonesoj.honey.commands.moderation.ChatCommand;
+import io.github.leonesoj.honey.commands.moderation.InvseeCommand;
 import io.github.leonesoj.honey.commands.moderation.SocialSpyCommand;
 import io.github.leonesoj.honey.commands.moderation.SpyCommand;
 import io.github.leonesoj.honey.commands.moderation.StaffCommand;
@@ -56,6 +57,7 @@ public class HoneyBootstrap implements PluginBootstrap {
       commands.registrar().register(ReportCommand.create());
       commands.registrar().register(SpeedCommand.create());
       commands.registrar().register(PingCommand.create());
+      commands.registrar().register(InvseeCommand.create());
 
       /* ITEM COMMANDS */
       commands.registrar().register(LoreCommand.create());

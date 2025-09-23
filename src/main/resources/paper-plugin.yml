@@ -13,10 +13,7 @@ dependencies:
       required: false
     Vault:
       load: BEFORE
-      required: false
-    ProtocolLib:
-      load: BEFORE
-      required: false
+      required: true
     PlaceholderAPI:
       load: BEFORE
       required: false

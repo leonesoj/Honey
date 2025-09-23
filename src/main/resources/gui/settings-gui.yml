@@ -72,3 +72,88 @@ main:
           - ""
           - "<i><yellow>Click to toggle</yellow></i>"
       sound: block.lever.click
+
+staff_settings:
+  title:
+    en-US: "Staff Settings"
+  size: 45
+  decorator:
+    type: "checkerboard"
+    checkerboard_item_one:
+      type: orange_stained_glass_pane
+    checkerboard_item_two:
+      type: white_stained_glass_pane
+  items:
+    show_staff:
+      type: armor_stand
+      slot: 10
+      display_name:
+        en-US: "<gold>Show Staff</gold>"
+      lore:
+        en-US:
+          - "<gray>Toggle whether or not you want</gray>"
+          - "<gray>to see players in <i>staff mode</i></gray>"
+          - ""
+          - "<gray>Currently:</gray> %status%"
+          - ""
+          - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
+    social_spy:
+      type: ender_eye
+      slot: 12
+      display_name:
+        en-US: "<dark_purple>Social Spy</dark_purple>"
+      lore:
+        en-US:
+          - "<gray>Toggle whether or not you want</gray>"
+          - "<gray>to oversee all chat channels and</gray>"
+          - "<gray>private message conversations</gray>"
+          - ""
+          - "<gray>Currently:</gray> %status%"
+          - ""
+          - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
+    persist_staff_mode:
+      type: minecart
+      slot: 14
+      display_name:
+        en-US: "<rainbow>Persist Staff Mode</rainbow>"
+      lore:
+        en-US:
+          - "<gray>Toggle whether or not you want</gray>"
+          - "<gray><i>persist</i> staff mode across server</gray>"
+          - "<gray>transfers(including on join)</gray>"
+          - ""
+          - "<gray>Currently:</gray> %status%"
+          - ""
+          - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
+    report_alerts:
+      type: book
+      slot: 16
+      display_name:
+        en-US: "<red>Report Alerts</red>"
+      lore:
+        en-US:
+          - "<gray>Toggle whether or not you want</gray>"
+          - "<gray>to be notified of newly submitted reports</gray>"
+          - ""
+          - "<gray>Currently:</gray> %status%"
+          - ""
+          - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
+    staff_alerts:
+      type: repeater
+      slot: 30
+      display_name:
+        en-US: "<aqua>Staff Alerts</aqua>"
+      lore:
+        en-US:
+          - "<gray>Toggle whether or not you want</gray>"
+          - "<gray>to see <i>network/server</i> alerts</gray>"
+          - "<gray>related to staff events</gray>"
+          - ""
+          - "<gray>Currently:</gray> %status%"
+          - ""
+          - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click

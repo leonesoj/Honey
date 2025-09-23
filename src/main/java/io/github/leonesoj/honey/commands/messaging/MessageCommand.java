@@ -29,7 +29,7 @@ public class MessageCommand {
     Player recipient = ctx.getArgument("player", Player.class);
     String message = ctx.getArgument("message", String.class);
 
-    Honey.getInstance().getPrivateChatService()
+    Honey.getInstance().getChatService().getPrivateChatService()
         .sendPrivateMessage(sender, recipient, Component.text(message));
 
     return Command.SINGLE_SUCCESS;
