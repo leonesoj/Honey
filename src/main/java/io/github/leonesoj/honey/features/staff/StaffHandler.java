@@ -8,24 +8,22 @@ import io.github.leonesoj.honey.database.data.controller.StaffSettingsController
 import io.github.leonesoj.honey.database.data.model.StaffSettings;
 import io.github.leonesoj.honey.database.data.model.StaffState;
 import io.github.leonesoj.honey.features.staff.vanish.VanishService;
-import io.github.leonesoj.honey.utils.other.DependCheck;
 import io.github.leonesoj.honey.utils.other.SchedulerUtil;
 import io.papermc.paper.event.player.PlayerServerFullCheckEvent;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
-import net.milkbowl.vault.permission.Permission;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class StaffHandler implements Listener {
 
@@ -50,9 +48,7 @@ public class StaffHandler implements Listener {
     Bukkit.getPluginManager().registerEvents(new StaffModeListener(this), Honey.getInstance());
     Bukkit.getPluginManager().registerEvents(staffItems, Honey.getInstance());
 
-    if (DependCheck.isLuckPermsInstalled()) {
-      new StaffPermsListener(this).startListening();
-    }
+    new StaffPermsListener(this).startListening();
   }
 
   public void toggleStaffMode(Player player) {
@@ -174,9 +170,15 @@ public class StaffHandler implements Listener {
 
   @EventHandler
   public void onFullServerJoin(PlayerServerFullCheckEvent event) {
+    User user = LuckPermsProvider.get().getUserManager().getUser(event.getPlayerProfile().getId());
+    if (user == null) {
+      return;
+    }
     if (!event.isAllowed()) {
-      event.allow(
-          hasPermissionOfflineWithVault(event.getPlayerProfile().getId())
+      event.allow(user.getCachedData()
+          .getPermissionData()
+          .checkPermission("honey.management.staff")
+          .asBoolean()
       );
     }
   }
@@ -196,17 +198,6 @@ public class StaffHandler implements Listener {
           )
       );
     }
-  }
-
-  private boolean hasPermissionOfflineWithVault(UUID uuid) {
-    RegisteredServiceProvider<Permission> rsp = Bukkit.getServicesManager()
-        .getRegistration(Permission.class);
-    if (rsp != null) {
-      Permission permissionProvider = rsp.getProvider();
-      OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-      return permissionProvider.playerHas(null, offlinePlayer, "honey.management.staff");
-    }
-    return false;
   }
 
   private void broadcastToStaff(Component component) {

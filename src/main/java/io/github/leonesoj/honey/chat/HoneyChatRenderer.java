@@ -8,8 +8,8 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.milkbowl.vault.chat.Chat;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.cacheddata.CachedMetaData;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
@@ -46,29 +46,16 @@ public class HoneyChatRenderer implements ChatRenderer {
       message = PlaceholderUtil.applyPlaceholders(source, message);
     }
 
-    TagResolver prefix = TagResolver.empty();
-    TagResolver suffix = TagResolver.empty();
-    TagResolver group = TagResolver.empty();
-    if (DependCheck.isVaultInstalled() && chatService.getVaultChat() != null) {
-      Chat chat = chatService.getVaultChat();
-      prefix = Placeholder.component(PREFIX_PLACEHOLDER,
-          miniMessage.deserialize(chat.getPlayerPrefix(source))
-      );
-      suffix = Placeholder.component(SUFFIX_PLACEHOLDER,
-          miniMessage.deserialize(chat.getPlayerSuffix(source))
-      );
-      group = Placeholder.component(PRIMARY_GROUP_PLACEHOLDER,
-          miniMessage.deserialize(chat.getPrimaryGroup(source))
-      );
-    }
+    CachedMetaData metaData = LuckPermsProvider.get()
+        .getPlayerAdapter(Player.class)
+        .getMetaData(source);
 
     Component result = MiniMessage.miniMessage().deserialize(sourceChannel.getFormat(),
         Placeholder.component(DISPLAY_NAME_PLACEHOLDER, sourceDisplayName),
         Placeholder.component(USERNAME_PLACEHOLDER, Component.text(source.getName())),
         Placeholder.component(CHAT_MESSAGE_PLACEHOLDER, message),
-        prefix,
-        suffix,
-        group
+        Placeholder.component(PREFIX_PLACEHOLDER, componentOrEmpty(metaData.getPrefix())),
+        Placeholder.component(SUFFIX_PLACEHOLDER, componentOrEmpty(metaData.getSuffix()))
     );
 
     Component channelPrefix = Component.empty();
@@ -77,6 +64,10 @@ public class HoneyChatRenderer implements ChatRenderer {
     }
 
     return channelPrefix.append(result);
+  }
+
+  private Component componentOrEmpty(String string) {
+    return string != null ? miniMessage.deserialize(string) : Component.empty();
   }
 
 }

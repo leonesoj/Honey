@@ -4,30 +4,22 @@ import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.database.data.controller.StaffSettingsController;
 import io.github.leonesoj.honey.utils.other.SchedulerUtil;
 import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.event.EventBus;
 import net.luckperms.api.event.node.NodeAddEvent;
 import net.luckperms.api.event.node.NodeRemoveEvent;
 import net.luckperms.api.model.user.User;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class StaffPermsListener {
-
-  private LuckPerms luckPerms;
 
   private final StaffHandler handler;
 
   public StaffPermsListener(StaffHandler handler) {
-    RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager()
-        .getRegistration(LuckPerms.class);
-    if (provider != null) {
-      luckPerms = provider.getProvider();
-    }
     this.handler = handler;
   }
 
   public void startListening() {
-    EventBus eventBus = luckPerms.getEventBus();
+    EventBus eventBus = LuckPermsProvider.get().getEventBus();
 
     final StaffSettingsController controller = Honey.getInstance().getDataHandler()
         .getStaffSettingsController();

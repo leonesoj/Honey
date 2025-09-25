@@ -8,14 +8,6 @@ public class DependCheck {
   private DependCheck() {
   }
 
-  public static boolean isVaultInstalled() {
-    return isPluginInstalled("Vault");
-  }
-
-  public static boolean isLuckPermsInstalled() {
-    return isPluginInstalled("LuckPerms");
-  }
-
   public static boolean isProtocolLibInstalled() {
     return isPluginInstalled("ProtocolLib");
   }

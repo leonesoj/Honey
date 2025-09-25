@@ -18,14 +18,12 @@ repositories {
         url = 'https://oss.sonatype.org/content/groups/public/'
     }
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
-    maven { url = 'https://jitpack.io' }
     maven { url = 'https://repo.extendedclip.com/releases/' }
 }
 
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT'
     compileOnly 'net.luckperms:api:5.4'
-    compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
     compileOnly 'me.clip:placeholderapi:2.11.6'
     compileOnly 'io.lettuce:lettuce-core:6.5.5.RELEASE'
     compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
@@ -42,7 +40,6 @@ tasks {
         minecraftVersion '1.21.8'
         downloadPlugins {
             modrinth ('luckperms', 'v5.5.0-bukkit')
-            github ('MilkBowl', 'Vault', '1.7.3', 'Vault.jar')
         }
     }
 }
