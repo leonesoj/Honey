@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
-import net.milkbowl.vault.chat.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,7 +20,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class ChatService implements Listener {
 
@@ -31,13 +29,11 @@ public class ChatService implements Listener {
   private final SpyService spyService;
 
   private ChatChannel defaultChannel;
-  private Chat chat;
 
   public ChatService(SpyService spyService) {
     this.spyService = spyService;
     this.privateChatService = new PrivateChatService(spyService);
     Bukkit.getPluginManager().registerEvents(this, Honey.getInstance());
-    setupVaultChat();
   }
 
   public void registerChannel(ChatChannel chatChannel) {
@@ -215,14 +211,5 @@ public class ChatService implements Listener {
         !chatChannel.hasMember(audience) && !isSpy(audience)
     );
     event.renderer(HoneyChatRenderer.getInstance());
-  }
-
-  public Chat getVaultChat() {
-    return chat;
-  }
-
-  private void setupVaultChat() {
-    RegisteredServiceProvider<Chat> rsp = Bukkit.getServicesManager().getRegistration(Chat.class);
-    chat = rsp.getProvider();
   }
 }

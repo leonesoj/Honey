@@ -10,9 +10,6 @@ dependencies:
   server:
     LuckPerms:
       load: BEFORE
-      required: false
-    Vault:
-      load: BEFORE
       required: true
     PlaceholderAPI:
       load: BEFORE
