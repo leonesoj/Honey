@@ -3,63 +3,41 @@ package io.github.leonesoj.honey.database.data.controller;
 import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.database.DataContainer;
 import io.github.leonesoj.honey.database.cache.CacheStore;
-import io.github.leonesoj.honey.database.cache.InMemoryCache;
-import io.github.leonesoj.honey.database.cache.NoOpCache;
-import io.github.leonesoj.honey.database.cache.RedisCache;
 import io.github.leonesoj.honey.database.data.model.PlayerSettings;
 import io.github.leonesoj.honey.database.providers.DataStore;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class SettingsController extends DataController<PlayerSettings> implements Listener {
 
-  private InMemoryCache hotCache;
+  private static final long TIMEOUT_MS = 1500;
 
-  public SettingsController(DataStore data, CacheStore cache) {
-    super(data, cache,
-        new DataContainer(PlayerSettings.STORAGE_KEY,
+  public SettingsController(DataStore data, CacheStore nearCache, CacheStore sharedCache) {
+    super(data,
+        new DataContainer(
+            PlayerSettings.STORAGE_KEY,
             PlayerSettings.PRIMARY_KEY,
             PlayerSettings.SCHEMA,
             Collections.emptySet()
         ),
+        nearCache,
+        sharedCache,
         PlayerSettings::deserialize,
         PlayerSettings::deserializeFromJson,
-        Honey.getInstance(),
-        true
+        Honey.getInstance()
     );
-
-    if (cache instanceof RedisCache) {
-      hotCache = new InMemoryCache(Honey.getInstance().getLogger());
-    }
-
     Bukkit.getPluginManager().registerEvents(this, Honey.getInstance());
   }
 
   public CompletableFuture<Optional<PlayerSettings>> getSettings(UUID uuid) {
-    if (hotCache != null) {
-      return hotCache.get(uuid.toString(), null)
-          .thenCompose(dataModel -> {
-            Optional<PlayerSettings> optional = dataModel.map(PlayerSettings.class::cast);
-            if (optional.isPresent()) {
-              return CompletableFuture.completedFuture(optional);
-            }
-
-            return get(uuid);
-          });
-    }
-
     return get(uuid);
   }
 
@@ -69,52 +47,59 @@ public class SettingsController extends DataController<PlayerSettings> implement
 
   public CompletableFuture<Boolean> updateSettingsSync(PlayerSettings settings) {
     return update(settings.getUniqueId(), settings)
-        .thenApply(result -> {
-          if (result && hotCache != null) {
-            hotCache.put(settings.getUniqueId().toString(), settings);
-          }
-
-          return result;
-        })
+        .thenApply(result -> result)
         .thenCompose(this::completeOnMainThread);
   }
 
-  @EventHandler(priority = EventPriority.LOW)
-  public void onPlayerJoin(AsyncPlayerPreLoginEvent event) {
-    UUID uuid = event.getUniqueId();
-
-    try {
-      Optional<PlayerSettings> optional = getSettings(uuid).get();
-      if (optional.isEmpty()) {
-        PlayerSettings model = new PlayerSettings(
-            uuid,
-            true,
-            true,
-            true,
-            true,
-            Collections.emptySet()
-        );
-
-        boolean success = create(uuid, model).get();
-        if (success && hotCache != null) {
-          hotCache.put(uuid.toString(), model);
-        }
-      }
-
-    } catch (ExecutionException | InterruptedException ignored) {
-      event.disallow(Result.KICK_OTHER,
-          Component.text("Failed to retrieve your player settings, please try again later",
-              NamedTextColor.RED
-          )
-      );
-    }
+  private PlayerSettings defaultSettings(UUID uuid) {
+    return new PlayerSettings(
+        uuid,
+        true,
+        true,
+        true,
+        true,
+        java.util.Collections.emptySet()
+    );
   }
 
   @EventHandler(priority = EventPriority.LOWEST)
-  public void onPlayerLeave(PlayerQuitEvent event) {
-    if (!(cache instanceof NoOpCache)) {
-      keysToFlush.add(buildKey(event.getPlayer().getUniqueId()));
+  public void onPreJoin(AsyncPlayerPreLoginEvent event) {
+    UUID uuid = event.getUniqueId();
+
+    Optional<PlayerSettings> loaded = getSettings(uuid)
+        .orTimeout(TIMEOUT_MS, java.util.concurrent.TimeUnit.MILLISECONDS)
+        .exceptionally(ex -> {
+          getLogger().warning(
+              "(PlayerSettings) load failed for " + uuid + ": " + ex.getMessage()
+          );
+          return Optional.empty();
+        })
+        .join();
+
+    PlayerSettings settings = loaded.orElseGet(() -> defaultSettings(uuid));
+
+    if (loaded.isEmpty()) {
+      create(uuid, settings)
+          .orTimeout(TIMEOUT_MS, java.util.concurrent.TimeUnit.MILLISECONDS)
+          .whenComplete((ok, ex) -> {
+            boolean created = ex == null && Boolean.TRUE.equals(ok);
+            if (!created) {
+              String key = buildKey(uuid);
+              nearCache.put(key, settings)
+                  .exceptionally(e -> {
+                    getLogger().warning(
+                        "(PlayerSettings) nearCache.put fallback failed for " + uuid + ": "
+                            + e.getMessage()
+                    );
+                    return false;
+                  });
+            }
+          });
     }
   }
 
+  @EventHandler
+  public void onPlayerQuit(PlayerQuitEvent event) {
+    evictKey(event.getPlayer().getUniqueId());
+  }
 }

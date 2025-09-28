@@ -17,7 +17,6 @@ public class InMemoryCache extends CacheStore {
   public InMemoryCache(Logger log) {
     super(log, CacheProvider.IN_MEMORY);
     this.cache = Caffeine.newBuilder()
-        .maximumSize(250)
         .recordStats()
         .build();
 
@@ -60,7 +59,7 @@ public class InMemoryCache extends CacheStore {
 
   @Override
   public double getHitRate() {
-    return cache.stats().evictionWeight();
+    return cache.stats().hitRate();
   }
 
   @Override

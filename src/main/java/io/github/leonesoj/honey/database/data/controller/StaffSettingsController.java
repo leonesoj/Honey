@@ -3,62 +3,43 @@ package io.github.leonesoj.honey.database.data.controller;
 import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.database.DataContainer;
 import io.github.leonesoj.honey.database.cache.CacheStore;
-import io.github.leonesoj.honey.database.cache.InMemoryCache;
-import io.github.leonesoj.honey.database.cache.RedisCache;
 import io.github.leonesoj.honey.database.data.model.StaffSettings;
 import io.github.leonesoj.honey.database.providers.DataStore;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
-import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class StaffSettingsController extends DataController<StaffSettings> implements Listener {
 
-  private InMemoryCache hotCache;
-
-  public StaffSettingsController(DataStore data, CacheStore cache) {
-    super(data, cache,
+  public StaffSettingsController(DataStore data, CacheStore nearCache, CacheStore sharedCache) {
+    super(data,
         new DataContainer(
             StaffSettings.STORAGE_KEY,
             StaffSettings.PRIMARY_KEY,
             StaffSettings.SCHEMA,
             Collections.emptySet()
         ),
+        nearCache,
+        sharedCache,
         StaffSettings::deserialize,
         StaffSettings::deserializeFromJson,
-        Honey.getInstance(),
-        false
+        Honey.getInstance()
     );
-
-    if (cache instanceof RedisCache) {
-      hotCache = new InMemoryCache(Honey.getInstance().getLogger());
-    }
 
     Bukkit.getPluginManager().registerEvents(this, Honey.getInstance());
   }
 
   public CompletableFuture<Optional<StaffSettings>> getSettings(UUID uuid) {
-    if (hotCache != null) {
-      return hotCache.get(uuid.toString(), null)
-          .thenCompose(dataModel -> {
-            Optional<StaffSettings> optional = dataModel.map(StaffSettings.class::cast);
-            if (optional.isPresent()) {
-              return CompletableFuture.completedFuture(optional);
-            }
-
-            return get(uuid);
-          });
-    }
-
     return get(uuid);
   }
 
@@ -67,14 +48,11 @@ public class StaffSettingsController extends DataController<StaffSettings> imple
   }
 
   public CompletableFuture<Boolean> createSettings(UUID uuid) {
-    StaffSettings defaultSettings = defaultSettings(uuid);
-    CompletableFuture<Boolean> databaseCreate = create(uuid, defaultSettings);
-    return hotCache != null ? hotCache.put(uuid.toString(), defaultSettings) : databaseCreate;
+    return create(uuid, defaultSettings(uuid));
   }
 
   public CompletableFuture<Boolean> deleteSettings(UUID uuid) {
-    CompletableFuture<Boolean> databaseDelete = delete(uuid);
-    return hotCache != null ? hotCache.delete(uuid.toString()) : databaseDelete;
+    return delete(uuid);
   }
 
   public CompletableFuture<Boolean> modifySettings(UUID uuid,
@@ -89,14 +67,7 @@ public class StaffSettingsController extends DataController<StaffSettings> imple
   }
 
   public CompletableFuture<Boolean> updateSettings(StaffSettings settings) {
-    return update(settings.getUniqueId(), settings)
-        .thenApply(result -> {
-          if (result && hotCache != null) {
-            hotCache.put(settings.getUniqueId().toString(), settings);
-          }
-
-          return result;
-        });
+    return update(settings.getUniqueId(), settings);
   }
 
   public CompletableFuture<Boolean> updateSettingsSync(StaffSettings settings) {
@@ -115,50 +86,45 @@ public class StaffSettingsController extends DataController<StaffSettings> imple
     );
   }
 
-  @EventHandler
-  public void onAsyncJoin(AsyncPlayerPreLoginEvent event) {
+  @EventHandler(priority = EventPriority.LOWEST)
+  public void onPreJoin(AsyncPlayerPreLoginEvent event) {
     UUID uuid = event.getUniqueId();
-
     LuckPerms lp = LuckPermsProvider.get();
 
-    User user = lp.getUserManager()
-        .loadUser(uuid)
+    lp.getUserManager().loadUser(uuid)
         .orTimeout(2, java.util.concurrent.TimeUnit.SECONDS)
-        .exceptionally(ex -> null)
-        .join();
+        .thenCompose(user -> {
+          if (user == null) {
+            return CompletableFuture.completedFuture(false);
+          }
 
-    if (user == null) {
-      return;
-    }
+          boolean allowed = user.getCachedData()
+              .getPermissionData()
+              .checkPermission("honey.management.staff")
+              .asBoolean();
 
-    boolean allowed = user.getCachedData()
-        .getPermissionData()
-        .checkPermission("honey.management.staff")
-        .asBoolean();
+          if (!allowed) {
+            return CompletableFuture.completedFuture(false);
+          }
 
-    if (!allowed) {
-      return;
-    }
+          return get(uuid).thenCompose(opt -> {
+            if (opt.isPresent()) {
+              return CompletableFuture.completedFuture(true);
+            }
+            return nearCache.put(buildKey(uuid), defaultSettings(uuid))
+                .exceptionally(throwable -> true)
+                .thenApply(ok -> true);
+          });
+        })
+        .exceptionally(ex -> {
+          nearCache.put(buildKey(uuid), defaultSettings(uuid)).exceptionally(throwable -> true);
+          return false;
+        });
+  }
 
-    try {
-      Optional<StaffSettings> optional = get(uuid).join();
-      StaffSettings cachedEntry;
-      if (optional.isEmpty()) {
-        create(uuid, defaultSettings(uuid)).get();
-        cachedEntry = defaultSettings(uuid);
-      } else {
-        cachedEntry = optional.get();
-      }
-
-      if (hotCache != null) {
-        hotCache.put(uuid.toString(), cachedEntry);
-      }
-    } catch (InterruptedException | ExecutionException exception) {
-      cache.put(uuid.toString(), defaultSettings(uuid));
-      if (hotCache != null) {
-        hotCache.put(uuid.toString(), defaultSettings(uuid));
-      }
-    }
+  @EventHandler
+  public void onPlayerQuit(PlayerQuitEvent event) {
+    evictKey(event.getPlayer().getUniqueId());
   }
 
 }

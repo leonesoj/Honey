@@ -2,7 +2,6 @@ package io.github.leonesoj.honey.database.data.controller;
 
 import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.database.DataContainer;
-import io.github.leonesoj.honey.database.cache.NoOpCache;
 import io.github.leonesoj.honey.database.data.model.Report;
 import io.github.leonesoj.honey.database.data.model.Report.ReportStatus;
 import io.github.leonesoj.honey.database.providers.DataStore;
@@ -18,16 +17,16 @@ public class ReportController extends DataController<Report> {
   public ReportController(DataStore data) {
     super(
         data,
-        new NoOpCache(),
         new DataContainer(Report.STORAGE_KEY,
             Report.PRIMARY_KEY,
             Report.SCHEMA,
             Report.INDEXED_FIELDS
         ),
+        NOOP_SHARED_INSTANCE,
+        NOOP_SHARED_INSTANCE,
         Report::deserialize,
         null,
-        Honey.getInstance(),
-        false
+        Honey.getInstance()
     );
     getObserverService().registerObserver(new ReportSubscriber());
   }
