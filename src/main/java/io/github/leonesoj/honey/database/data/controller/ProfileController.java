@@ -2,7 +2,6 @@ package io.github.leonesoj.honey.database.data.controller;
 
 import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.database.DataContainer;
-import io.github.leonesoj.honey.database.cache.NoOpCache;
 import io.github.leonesoj.honey.database.data.model.PlayerProfile;
 import io.github.leonesoj.honey.database.providers.DataStore;
 import java.time.Duration;
@@ -12,14 +11,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -29,17 +26,17 @@ public class ProfileController extends DataController<PlayerProfile> implements 
 
   public ProfileController(DataStore data, boolean networkMode) {
     super(data,
-        new NoOpCache(),
         new DataContainer(
             PlayerProfile.STORAGE_KEY,
             PlayerProfile.PRIMARY_INDEX,
             PlayerProfile.SCHEMA,
             Collections.emptySet()
         ),
+        NOOP_SHARED_INSTANCE,
+        NOOP_SHARED_INSTANCE,
         PlayerProfile::deserialize,
         null,
-        Honey.getInstance(),
-        false
+        Honey.getInstance()
     );
 
     if (!networkMode) {
@@ -51,40 +48,33 @@ public class ProfileController extends DataController<PlayerProfile> implements 
     return get(uuid);
   }
 
-  @EventHandler
+  @EventHandler(priority = EventPriority.LOWEST)
   public void onPreJoin(AsyncPlayerPreLoginEvent event) {
     UUID uuid = event.getUniqueId();
+    String serverId = Honey.getInstance().getServerId();
+    Instant now = Instant.now();
 
-    final String serverId = Honey.getInstance().getServerId();
-
-    try {
-      Optional<PlayerProfile> optional = get(uuid).get();
-      Instant now = Instant.now();
-
-      if (optional.isPresent()) {
-        PlayerProfile profile = optional.get();
-        profile.setLastConnected(serverId);
-        profile.setLastSeen(now);
-
-        update(profile.getUuid(), profile);
-      } else {
-        PlayerProfile newProfile = new PlayerProfile(
-            uuid,
-            Honey.getInstance().getSecretHandler().hash(event.getAddress().getHostAddress()),
-            now,
-            now,
-            Duration.ZERO,
-            serverId
-        );
-        create(newProfile.getUuid(), newProfile);
-      }
-    } catch (InterruptedException | ExecutionException exception) {
-      event.disallow(Result.KICK_OTHER, Component.translatable("honey.profile.failed"));
-      getLogger().log(Level.SEVERE,
-          "An error occurred while trying to process a PlayerProfile",
-          exception
-      );
-    }
+    get(uuid)
+        .thenCompose(opt -> {
+          if (opt.isPresent()) {
+            PlayerProfile profile = opt.get();
+            profile.setLastConnected(serverId);
+            profile.setLastSeen(now);
+            return update(profile.getUuid(), profile);
+          } else {
+            PlayerProfile profile = new PlayerProfile(
+                uuid,
+                Honey.getInstance().getSecretHandler().hash(event.getAddress().getHostAddress()),
+                now, now, Duration.ZERO, serverId
+            );
+            return create(profile.getUuid(), profile);
+          }
+        })
+        .orTimeout(2, java.util.concurrent.TimeUnit.SECONDS)
+        .exceptionally(ex -> {
+          getLogger().log(Level.SEVERE, "(PlayerProfile) get/create failed for " + uuid, ex);
+          return false;
+        });
   }
 
   @EventHandler

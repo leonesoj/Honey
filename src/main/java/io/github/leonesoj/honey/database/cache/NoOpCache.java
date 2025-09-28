@@ -10,7 +10,7 @@ import java.util.function.Function;
 public class NoOpCache extends CacheStore {
 
   public NoOpCache() {
-    super(null, null);
+    super(null, CacheProvider.NO_OP);
   }
 
   @Override
@@ -21,17 +21,17 @@ public class NoOpCache extends CacheStore {
 
   @Override
   public CompletableFuture<Boolean> put(String key, DataModel value) {
-    return CompletableFuture.completedFuture(null);
+    return CompletableFuture.completedFuture(true);
   }
 
   @Override
   public CompletableFuture<Boolean> delete(String key) {
-    return CompletableFuture.completedFuture(null);
+    return CompletableFuture.completedFuture(true);
   }
 
   @Override
   public CompletableFuture<Boolean> flush(Set<String> keys) {
-    return CompletableFuture.completedFuture(null);
+    return CompletableFuture.completedFuture(true);
   }
 
   @Override

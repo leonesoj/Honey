@@ -3,6 +3,7 @@ package io.github.leonesoj.honey.database;
 import io.github.leonesoj.honey.database.cache.CacheProvider;
 import io.github.leonesoj.honey.database.cache.CacheStore;
 import io.github.leonesoj.honey.database.cache.InMemoryCache;
+import io.github.leonesoj.honey.database.cache.NoOpCache;
 import io.github.leonesoj.honey.database.cache.RedisCache;
 import io.github.leonesoj.honey.database.data.controller.ProfileController;
 import io.github.leonesoj.honey.database.data.controller.ReportController;
@@ -13,7 +14,6 @@ import io.github.leonesoj.honey.database.providers.DataStore;
 import io.github.leonesoj.honey.database.providers.MongoData;
 import io.github.leonesoj.honey.database.providers.MySqlData;
 import io.github.leonesoj.honey.database.providers.SqliteData;
-import io.lettuce.core.RedisConnectionException;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -23,24 +23,33 @@ public class DataHandler {
   private final ConfigurationSection databaseConfig;
 
   private final DataStore dataStore;
-  private final CacheStore cache;
+
+  private final CacheStore nearCache;
+  private final CacheStore sharedCache;
 
   private final SettingsController settingsController;
   private final ProfileController profileController;
   private final StaffSettingsController staffSettingsController;
   private final ReportController reportController;
 
-  public DataHandler(JavaPlugin plugin, String databaseProvider,
-      ConfigurationSection databaseConfig, String cacheProvider, ConfigurationSection redisConfig) {
+  public DataHandler(JavaPlugin plugin,
+      String databaseProvider,
+      ConfigurationSection databaseConfig,
+      String cacheProvider,
+      ConfigurationSection redisConfig) {
     this.plugin = plugin;
     this.databaseConfig = databaseConfig;
 
-    this.dataStore = initHoneyData(databaseProvider);
-    this.cache = initCacheProvider(cacheProvider, redisConfig);
+    this.dataStore = initDataStore(parseDataProvider(databaseProvider));
 
-    this.settingsController = new SettingsController(dataStore, cache);
+    CacheInit cacheInit = initCaches(parseCacheProvider(cacheProvider), redisConfig);
+    this.nearCache = cacheInit.near();
+    this.sharedCache = cacheInit.shared();
+
+    this.settingsController = new SettingsController(dataStore, nearCache, sharedCache);
+    this.staffSettingsController = new StaffSettingsController(dataStore, nearCache, sharedCache);
+
     this.profileController = new ProfileController(dataStore, false);
-    this.staffSettingsController = new StaffSettingsController(dataStore, cache);
     this.reportController = new ReportController(dataStore);
   }
 
@@ -60,47 +69,63 @@ public class DataHandler {
     return staffSettingsController;
   }
 
-  private DataStore initHoneyData(String databaseProvider) {
-    return switch (databaseProvider.toLowerCase()) {
-      case "mongodb" ->
-          new MongoData(databaseConfig.getString("connection_string"), plugin.getLogger());
-      case "mysql" -> new MySqlData(databaseConfig.getString("host"),
+  private DataStore initDataStore(DataProvider provider) {
+    return switch (provider) {
+      case MONGODB -> new MongoData(
+          databaseConfig.getString("connection_string"),
+          plugin.getLogger()
+      );
+      case MYSQL -> new MySqlData(
+          databaseConfig.getString("host"),
           databaseConfig.getInt("port"),
           databaseConfig.getString("database"),
           databaseConfig.getString("user"),
-          databaseConfig.getString("password"), plugin.getLogger());
-      default -> new SqliteData(plugin.getDataPath(), databaseConfig.getString("database"),
-          plugin.getLogger());
+          databaseConfig.getString("password"),
+          plugin.getLogger()
+      );
+      case SQLITE -> new SqliteData(
+          plugin.getDataPath(),
+          databaseConfig.getString("database"),
+          plugin.getLogger()
+      );
     };
   }
 
-  private CacheStore initCacheProvider(String cacheProvider, ConfigurationSection redisConfig) {
-    switch (cacheProvider.toLowerCase()) {
-      case "redis":
-        try {
-          return new RedisCache(
-              redisConfig.getString("host"),
-              redisConfig.getInt("port"),
-              redisConfig.getString("password"),
-              plugin.getLogger()
-          );
-        } catch (RedisConnectionException e) {
-          plugin.getLogger().warning("Falling back to In-Memory cache");
-          return new InMemoryCache(plugin.getLogger());
-        }
-      case "memory", "in-memory":
-        return new InMemoryCache(plugin.getLogger());
-      default:
-        plugin.getLogger().warning(
-            "Cache provider '%s' is not supported. Falling back to In-Memory cache"
-                .formatted(cacheProvider)
-        );
-        return new InMemoryCache(plugin.getLogger());
-    }
+  private record CacheInit(CacheStore near, CacheStore shared) {
+
   }
 
-  public CacheProvider getCacheProvider() {
-    return cache.getProvider();
+  private CacheInit initCaches(CacheProvider provider, ConfigurationSection redis) {
+    CacheStore near = new InMemoryCache(plugin.getLogger());
+    switch (provider) {
+      case REDIS -> {
+        try {
+          CacheStore shared = new RedisCache(
+              redis.getString("host"),
+              redis.getInt("port"),
+              redis.getString("password"),
+              plugin.getLogger()
+          );
+          return new CacheInit(near, shared);
+        } catch (RuntimeException e) {
+          plugin.getLogger()
+              .warning("Redis unavailable: " + e.getMessage());
+          return new CacheInit(near, new NoOpCache());
+        }
+      }
+      case IN_MEMORY, NO_OP -> {
+        return new CacheInit(near, new NoOpCache());
+      }
+    }
+    return new CacheInit(near, new NoOpCache());
+  }
+
+  public CacheProvider getNearCacheProvider() {
+    return nearCache.getProvider();
+  }
+
+  public CacheProvider getSharedCacheProvider() {
+    return sharedCache.getProvider();
   }
 
   public DataProvider getDataProvider() {
@@ -109,7 +134,32 @@ public class DataHandler {
 
   public void closeConnection() {
     dataStore.closeConnection();
-    cache.shutdownCache();
+    nearCache.shutdownCache();
+    sharedCache.shutdownCache();
+  }
+
+  private static DataProvider parseDataProvider(String provider) {
+    String string = normalize(provider);
+    return switch (string) {
+      case "mongodb", "mongo" -> DataProvider.MONGODB;
+      case "mysql" -> DataProvider.MYSQL;
+      case "sqlite", "" -> DataProvider.SQLITE;
+      default -> DataProvider.SQLITE;
+    };
+  }
+
+  private static CacheProvider parseCacheProvider(String provider) {
+    String string = normalize(provider);
+    return switch (string) {
+      case "redis" -> CacheProvider.REDIS;
+      case "in-memory", "memory" -> CacheProvider.IN_MEMORY;
+      case "noop", "no_op", "no-op", "none", "" -> CacheProvider.NO_OP;
+      default -> CacheProvider.NO_OP;
+    };
+  }
+
+  private static String normalize(String s) {
+    return (s == null) ? "" : s.trim().toLowerCase();
   }
 
 }
