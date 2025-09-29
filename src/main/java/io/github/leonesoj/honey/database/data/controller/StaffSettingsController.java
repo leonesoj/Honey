@@ -111,9 +111,15 @@ public class StaffSettingsController extends DataController<StaffSettings> imple
             if (opt.isPresent()) {
               return CompletableFuture.completedFuture(true);
             }
-            return nearCache.put(buildKey(uuid), defaultSettings(uuid))
-                .exceptionally(throwable -> true)
-                .thenApply(ok -> true);
+
+            StaffSettings defaults = defaultSettings(uuid);
+            return create(uuid, defaults)
+                .handle((ok, ex) -> ok != null && ok)
+                .thenCompose(ok -> ok
+                    ? CompletableFuture.completedFuture(true)
+                    : nearCache.put(buildKey(uuid), defaults)
+                        .exceptionally(throwable -> true)
+                        .thenApply(x -> true));
           });
         })
         .exceptionally(ex -> {
