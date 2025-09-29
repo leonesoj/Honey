@@ -33,28 +33,21 @@ public class SettingsInventory extends SerializedInventory {
 
   @Override
   protected void buildContent() {
-    InventoryDecorator.createLoadingScreen(getInventory());
-
-    controller.getSettingsSync(uuid)
-        .exceptionally(throwable -> {
-          InventoryDecorator.createErrorScreen(this, null);
-          return Optional.empty();
-        })
-        .thenAccept(optional -> {
-          if (optional.isPresent()) {
-            PlayerSettings settings = optional.get();
-            applyDecorator(true);
-
-            addItem(prepareItem(SettingType.CHAT_MESSAGES, settings.hasChatMessages()),
-                toggle(settings, SettingType.CHAT_MESSAGES));
-            addItem(prepareItem(SettingType.PRIVATE_MESSAGES, settings.hasPrivateMessages()),
-                toggle(settings, SettingType.PRIVATE_MESSAGES));
-            addItem(prepareItem(SettingType.PROFANITY_FILTER, settings.hasProfanityFilter()),
-                toggle(settings, SettingType.PROFANITY_FILTER));
-            addItem(prepareItem(SettingType.SOUND_ALERTS, settings.hasSoundAlerts()),
-                toggle(settings, SettingType.SOUND_ALERTS));
-          }
-        });
+    Optional<PlayerSettings> optional = controller.getSettings(uuid);
+    if (optional.isPresent()) {
+      PlayerSettings settings = optional.get();
+      applyDecorator(true);
+      addItem(prepareItem(SettingType.CHAT_MESSAGES, settings.hasChatMessages()),
+          toggle(settings, SettingType.CHAT_MESSAGES));
+      addItem(prepareItem(SettingType.PRIVATE_MESSAGES, settings.hasPrivateMessages()),
+          toggle(settings, SettingType.PRIVATE_MESSAGES));
+      addItem(prepareItem(SettingType.PROFANITY_FILTER, settings.hasProfanityFilter()),
+          toggle(settings, SettingType.PROFANITY_FILTER));
+      addItem(prepareItem(SettingType.SOUND_ALERTS, settings.hasSoundAlerts()),
+          toggle(settings, SettingType.SOUND_ALERTS));
+    } else {
+      InventoryDecorator.createErrorScreen(this, null);
+    }
   }
 
   private Consumer<InventoryClickEvent> toggle(PlayerSettings settings, SettingType type) {

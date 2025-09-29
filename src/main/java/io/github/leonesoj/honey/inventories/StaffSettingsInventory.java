@@ -36,30 +36,24 @@ public class StaffSettingsInventory extends SerializedInventory {
 
   @Override
   protected void buildContent() {
-    InventoryDecorator.createLoadingScreen(getInventory());
+    Optional<StaffSettings> optional = controller.getSettings(uuid);
+    if (optional.isPresent()) {
+      StaffSettings settings = optional.get();
+      applyDecorator(true);
 
-    controller.getSettingsSync(uuid)
-        .exceptionally(throwable -> {
-          InventoryDecorator.createErrorScreen(this, null);
-          return Optional.empty();
-        })
-        .thenAccept(optional -> {
-          if (optional.isPresent()) {
-            StaffSettings settings = optional.get();
-            applyDecorator(true);
-
-            addItem(prepareItem(SettingType.SHOW_STAFF, settings.hasVisibleStaff()),
-                toggle(settings, SettingType.SHOW_STAFF));
-            addItem(prepareItem(SettingType.SOCIAL_SPY, settings.hasSocialSpy()),
-                toggle(settings, SettingType.SOCIAL_SPY));
-            addItem(prepareItem(SettingType.PERSIST_STAFF_MODE, settings.shouldPersistStaffMode()),
-                toggle(settings, SettingType.PERSIST_STAFF_MODE));
-            addItem(prepareItem(SettingType.REPORT_ALERTS, settings.hasReportAlerts()),
-                toggle(settings, SettingType.REPORT_ALERTS));
-            addItem(prepareItem(SettingType.STAFF_ALERTS, settings.hasStaffAlerts()),
-                toggle(settings, SettingType.STAFF_ALERTS));
-          }
-        });
+      addItem(prepareItem(SettingType.SHOW_STAFF, settings.hasVisibleStaff()),
+          toggle(settings, SettingType.SHOW_STAFF));
+      addItem(prepareItem(SettingType.SOCIAL_SPY, settings.hasSocialSpy()),
+          toggle(settings, SettingType.SOCIAL_SPY));
+      addItem(prepareItem(SettingType.PERSIST_STAFF_MODE, settings.shouldPersistStaffMode()),
+          toggle(settings, SettingType.PERSIST_STAFF_MODE));
+      addItem(prepareItem(SettingType.REPORT_ALERTS, settings.hasReportAlerts()),
+          toggle(settings, SettingType.REPORT_ALERTS));
+      addItem(prepareItem(SettingType.STAFF_ALERTS, settings.hasStaffAlerts()),
+          toggle(settings, SettingType.STAFF_ALERTS));
+    } else {
+      InventoryDecorator.createErrorScreen(this, null);
+    }
   }
 
   private Consumer<InventoryClickEvent> toggle(StaffSettings settings, SettingType type) {

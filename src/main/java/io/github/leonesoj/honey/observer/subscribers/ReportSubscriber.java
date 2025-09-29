@@ -21,9 +21,9 @@ public class ReportSubscriber implements Observer<Report> {
     Bukkit.getOnlinePlayers().forEach(player -> {
       if (player.hasPermission("honey.management.staff")) {
         Honey.getInstance().getDataHandler().getStaffSettingsController()
-            .getSettingsSync(player.getUniqueId())
-            .thenAccept(optional -> optional.ifPresent(staffSession -> {
-              if (staffSession.hasReportAlerts()) {
+            .getSettings(player.getUniqueId())
+            .ifPresent(settings -> {
+              if (settings.hasReportAlerts()) {
                 player.sendMessage(
                     Component.translatable("honey.report.broadcast",
                         argComponent("issuer", Bukkit.getPlayer(report.getIssuer()).getName()),
@@ -35,7 +35,7 @@ public class ReportSubscriber implements Observer<Report> {
                     )
                 );
               }
-            }));
+            });
       }
     });
   }

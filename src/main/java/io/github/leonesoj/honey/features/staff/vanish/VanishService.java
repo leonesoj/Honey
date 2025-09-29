@@ -69,16 +69,15 @@ public class VanishService implements Listener {
       }
 
       final UUID observerUuid = observer.getUniqueId();
-      settingsController.getSettingsSync(observerUuid)
-          .thenAccept(optional -> optional.ifPresent(settings -> {
-            boolean canSeeStaff = settings.inStaffMode() || settings.hasVisibleStaff();
-            boolean hide = vanish && !canSeeStaff;
-            if (hide) {
-              vanishProvider.hidePlayer(observer, subject);
-            } else {
-              vanishProvider.showPlayer(observer, subject);
-            }
-          }));
+      settingsController.getSettings(observerUuid).ifPresent(settings -> {
+        boolean canSeeStaff = settings.inStaffMode() || settings.hasVisibleStaff();
+        boolean hide = vanish && !canSeeStaff;
+        if (hide) {
+          vanishProvider.hidePlayer(observer, subject);
+        } else {
+          vanishProvider.showPlayer(observer, subject);
+        }
+      });
     }
   }
 
@@ -136,18 +135,13 @@ public class VanishService implements Listener {
       return;
     }
 
-    settingsController.getSettingsSync(observer.getUniqueId())
-        .thenAccept(optional -> {
-          boolean canSeeStaff = optional
-              .map(settings -> settings.inStaffMode() || settings.hasVisibleStaff())
-              .orElse(false);
-
-          if (canSeeStaff) {
-            showAllVanishedFor(observer);
-          } else {
-            hideAllVanishedFor(observer);
-          }
-        });
+    settingsController.getSettings(observer.getUniqueId()).ifPresent(settings -> {
+      if (settings.inStaffMode() || settings.hasVisibleStaff()) {
+        showAllVanishedFor(observer);
+      } else {
+        hideAllVanishedFor(observer);
+      }
+    });
   }
 
   @EventHandler

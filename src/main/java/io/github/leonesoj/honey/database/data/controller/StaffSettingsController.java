@@ -39,12 +39,9 @@ public class StaffSettingsController extends DataController<StaffSettings> imple
     Bukkit.getPluginManager().registerEvents(this, Honey.getInstance());
   }
 
-  public CompletableFuture<Optional<StaffSettings>> getSettings(UUID uuid) {
-    return get(uuid);
-  }
-
-  public CompletableFuture<Optional<StaffSettings>> getSettingsSync(UUID uuid) {
-    return getSettings(uuid).thenCompose(this::completeOnMainThread);
+  public Optional<StaffSettings> getSettings(UUID uuid) {
+    String key = buildKey(uuid);
+    return nearCache.get(key, StaffSettings::deserializeFromJson).getNow(Optional.empty());
   }
 
   public CompletableFuture<Boolean> createSettings(UUID uuid) {
@@ -57,7 +54,7 @@ public class StaffSettingsController extends DataController<StaffSettings> imple
 
   public CompletableFuture<Boolean> modifySettings(UUID uuid,
       Function<StaffSettings, StaffSettings> mutator) {
-    return getSettings(uuid).thenCompose(optional -> {
+    return get(uuid).thenCompose(optional -> {
       if (optional.isPresent()) {
         StaffSettings mutated = mutator.apply(optional.get());
         return updateSettings(mutated);

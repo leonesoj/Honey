@@ -37,12 +37,9 @@ public class SettingsController extends DataController<PlayerSettings> implement
     Bukkit.getPluginManager().registerEvents(this, Honey.getInstance());
   }
 
-  public CompletableFuture<Optional<PlayerSettings>> getSettings(UUID uuid) {
-    return get(uuid);
-  }
-
-  public CompletableFuture<Optional<PlayerSettings>> getSettingsSync(UUID uuid) {
-    return getSettings(uuid).thenCompose(this::completeOnMainThread);
+  public Optional<PlayerSettings> getSettings(UUID uuid) {
+    String key = buildKey(uuid);
+    return nearCache.get(key, PlayerSettings::deserializeFromJson).getNow(Optional.empty());
   }
 
   public CompletableFuture<Boolean> updateSettingsSync(PlayerSettings settings) {
@@ -66,7 +63,7 @@ public class SettingsController extends DataController<PlayerSettings> implement
   public void onPreJoin(AsyncPlayerPreLoginEvent event) {
     UUID uuid = event.getUniqueId();
 
-    Optional<PlayerSettings> loaded = getSettings(uuid)
+    Optional<PlayerSettings> loaded = get(uuid)
         .orTimeout(TIMEOUT_MS, java.util.concurrent.TimeUnit.MILLISECONDS)
         .exceptionally(ex -> {
           getLogger().warning(

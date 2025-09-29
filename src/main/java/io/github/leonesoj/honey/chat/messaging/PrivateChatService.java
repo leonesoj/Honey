@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -56,98 +55,86 @@ public class PrivateChatService implements Listener {
     SettingsController settingsController = Honey.getInstance().getDataHandler()
         .getSettingsController();
 
-    CompletableFuture<Optional<PlayerSettings>> senderSettingsFuture =
-        settingsController.getSettings(senderUuid);
+    Optional<PlayerSettings> senderSettingsOpt = settingsController.getSettings(senderUuid);
+    Optional<PlayerSettings> targetSettingsOpt = settingsController.getSettings(recipientUuid);
 
-    CompletableFuture<Optional<PlayerSettings>> targetSettingsFuture =
-        settingsController.getSettings(recipientUuid);
+    if (senderSettingsOpt.isEmpty() || targetSettingsOpt.isEmpty()) {
+      return;
+    }
 
-    senderSettingsFuture.thenCombine(targetSettingsFuture,
-        (senderSettingsOpt, targetSettingsOpt) -> {
-          // Proceed only if both are present
-          if (senderSettingsOpt.isEmpty() || targetSettingsOpt.isEmpty()) {
-            return null;
-          }
+    PlayerSettings senderSettings = senderSettingsOpt.get();
+    PlayerSettings targetSettings = targetSettingsOpt.get();
 
-          Bukkit.getGlobalRegionScheduler().run(Honey.getInstance(), task -> {
-            PlayerSettings senderSettings = senderSettingsOpt.get();
-            PlayerSettings targetSettings = targetSettingsOpt.get();
+    if (!senderSettings.hasPrivateMessages()) {
+      sender.sendMessage(Component.translatable("honey.messaging.self.disallowed"));
+      return;
+    }
 
-            if (!senderSettings.hasPrivateMessages()) {
-              sender.sendMessage(Component.translatable("honey.messaging.self.disallowed"));
-              return;
-            }
+    if (!targetSettings.hasPrivateMessages()) {
+      sender.sendMessage(Component.translatable("honey.messaging.target.disallowed"));
+      return;
+    }
 
-            if (!targetSettings.hasPrivateMessages()) {
-              sender.sendMessage(Component.translatable("honey.messaging.target.disallowed"));
-              return;
-            }
+    if (senderSettings.getIgnoreList().contains(recipientUuid)) {
+      sender.sendMessage(Component.translatable("honey.messaging.target.ignored"));
+      return;
+    }
 
-            if (senderSettings.getIgnoreList().contains(recipientUuid)) {
-              sender.sendMessage(Component.translatable("honey.messaging.target.ignored"));
-              return;
-            }
+    if (targetSettings.getIgnoreList().contains(senderUuid)) {
+      sender.sendMessage(Component.translatable("honey.messaging.self.ignored"));
+      return;
+    }
 
-            if (targetSettings.getIgnoreList().contains(senderUuid)) {
-              sender.sendMessage(Component.translatable("honey.messaging.self.ignored"));
-              return;
-            }
+    if (targetSettings.hasSoundAlerts()) {
+      recipient.playSound(recipient, Sound.ENTITY_ARROW_HIT_PLAYER, 1F, 0.5F);
+    }
 
-            if (targetSettings.hasSoundAlerts()) {
-              recipient.playSound(recipient, Sound.ENTITY_ARROW_HIT_PLAYER, 1F, 0.5F);
-            }
+    startSession(senderUuid, recipientUuid);
 
-            startSession(senderUuid, recipientUuid);
+    lastContacts.put(senderUuid, recipientUuid);
+    lastContacts.putIfAbsent(recipientUuid, senderUuid);
 
-            lastContacts.put(senderUuid, recipientUuid);
-            lastContacts.putIfAbsent(recipientUuid, senderUuid);
+    respond(senderUuid, recipientUuid); // For metadata tracking
 
-            respond(senderUuid, recipientUuid); // For metadata tracking
+    ConfigurationSection chatSection = Honey.getInstance().getConfig()
+        .getConfigurationSection("chat");
+    Component toUser = MINI_MESSAGE.deserialize(
+        chatSection.getString(PRIVATE_MESSAGE_FORMAT_PATH + "to_user"),
+        Placeholder.component("recipient", recipient.displayName()),
+        Placeholder.component("message", message)
+    );
+    Component fromUser = MINI_MESSAGE.deserialize(
+        chatSection.getString(PRIVATE_MESSAGE_FORMAT_PATH + "from_user"),
+        Placeholder.component("sender", sender.displayName()),
+        Placeholder.component("message", message)
+    );
 
-            ConfigurationSection chatSection = Honey.getInstance().getConfig()
-                .getConfigurationSection("chat");
-            Component toUser = MINI_MESSAGE.deserialize(
-                chatSection.getString(PRIVATE_MESSAGE_FORMAT_PATH + "to_user"),
-                Placeholder.component("recipient", recipient.displayName()),
-                Placeholder.component("message", message)
-            );
-            Component fromUser = MINI_MESSAGE.deserialize(
-                chatSection.getString(PRIVATE_MESSAGE_FORMAT_PATH + "from_user"),
-                Placeholder.component("sender", sender.displayName()),
-                Placeholder.component("message", message)
-            );
+    sender.sendMessage(toUser);
+    recipient.sendMessage(fromUser);
 
-            sender.sendMessage(toUser);
-            recipient.sendMessage(fromUser);
+    if (spyService.isBeingSpied(recipientUuid) || spyService.isBeingSpied(senderUuid)) {
+      TagResolver playerPlaceholder = Placeholder.component("player", sender.name());
+      TagResolver recipientPlaceholder = Placeholder.component("recipient", recipient.name());
+      TagResolver messagePlaceholder = Placeholder.component("message", message);
 
-            if (spyService.isBeingSpied(recipientUuid) || spyService.isBeingSpied(senderUuid)) {
-              TagResolver playerPlaceholder = Placeholder.component("player", sender.name());
-              TagResolver recipientPlaceholder = Placeholder.component("recipient",
-                  recipient.name());
-              TagResolver messagePlaceholder = Placeholder.component("message", message);
+      Component toSpy = MINI_MESSAGE.deserialize(
+          chatSection.getString("spy.format.private_message"),
+          playerPlaceholder,
+          recipientPlaceholder,
+          messagePlaceholder
+      );
 
-              Component toSpy = MINI_MESSAGE.deserialize(
-                  chatSection.getString("spy.format.private_message"),
-                  playerPlaceholder,
-                  recipientPlaceholder,
-                  messagePlaceholder
-              );
+      Set<UUID> spies = new HashSet<>();
+      spies.addAll(spyService.getSpiesBySubject(senderUuid));
+      spies.addAll(spyService.getSpiesBySubject(recipientUuid));
 
-              Set<UUID> spies = new HashSet<>();
-              spies.addAll(spyService.getSpiesBySubject(senderUuid));
-              spies.addAll(spyService.getSpiesBySubject(recipientUuid));
-
-              for (UUID spy : spies) {
-                Player spyPlayer = Bukkit.getPlayer(spy);
-                if (spyPlayer != null && spyPlayer.isOnline()) {
-                  spyPlayer.sendMessage(toSpy);
-                }
-              }
-            }
-          });
-
-          return null;
-        });
+      for (UUID spy : spies) {
+        Player spyPlayer = Bukkit.getPlayer(spy);
+        if (spyPlayer != null && spyPlayer.isOnline()) {
+          spyPlayer.sendMessage(toSpy);
+        }
+      }
+    }
   }
 
   public UUID getLastContact(UUID sender) {
@@ -163,4 +150,3 @@ public class PrivateChatService implements Listener {
     lastContacts.remove(quitting);
   }
 }
-

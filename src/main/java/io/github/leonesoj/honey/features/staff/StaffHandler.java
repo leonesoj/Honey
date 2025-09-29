@@ -11,6 +11,7 @@ import io.github.leonesoj.honey.features.staff.vanish.VanishService;
 import io.github.leonesoj.honey.utils.other.SchedulerUtil;
 import io.papermc.paper.event.player.PlayerServerFullCheckEvent;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
@@ -139,24 +140,28 @@ public class StaffHandler implements Listener {
     Player player = event.getPlayer();
 
     if (player.hasPermission("honey.management.staff")) {
-      settingsController.getSettingsSync(player.getUniqueId())
-          .thenAccept(optional -> optional.ifPresent(settings -> {
-            if (settings.inStaffMode() && settings.shouldPersistStaffMode()) {
-              setAsStaff(player);
-            } else if (settings.inStaffMode() && !settings.shouldPersistStaffMode()) {
-              restorePlayer(player);
-            }
-            if (!settings.inStaffMode() && settings.hasVisibleStaff()) {
-              vanishService.showAllVanishedFor(player);
-            } else if (!settings.hasVisibleStaff() && !settings.inStaffMode()) {
-              vanishService.hideAllVanishedFor(player);
-            }
-            if (settings.hasSocialSpy()) {
-              spyService.toggleGlobalSpy(player.getUniqueId());
-            }
-          }));
+      Optional<StaffSettings> optional = settingsController.getSettings(player.getUniqueId());
 
-      event.joinMessage(null);
+      if (optional.isPresent()) {
+        StaffSettings settings = optional.get();
+
+        if (settings.inStaffMode() && settings.shouldPersistStaffMode()) {
+          setAsStaff(player);
+          event.joinMessage(null);
+        } else if (settings.inStaffMode() && !settings.shouldPersistStaffMode()) {
+          restorePlayer(player);
+        }
+        if (!settings.inStaffMode() && settings.hasVisibleStaff()) {
+          vanishService.showAllVanishedFor(player);
+        } else if (!settings.hasVisibleStaff() && !settings.inStaffMode()) {
+          vanishService.hideAllVanishedFor(player);
+        }
+        if (settings.hasSocialSpy()) {
+          spyService.toggleGlobalSpy(player.getUniqueId());
+        }
+
+      }
+
       broadcastToStaff(
           Component.translatable("honey.staff.join",
               argComponent("player", player.getName()),
@@ -206,16 +211,11 @@ public class StaffHandler implements Listener {
         continue;
       }
 
-      settingsController.getSettingsSync(player.getUniqueId())
-          .thenAccept(optional -> {
-            boolean receivesAlerts = optional
-                .map(StaffSettings::hasStaffAlerts)
-                .orElse(true);
-
-            if (receivesAlerts) {
-              player.sendMessage(component);
-            }
-          });
+      settingsController.getSettings(player.getUniqueId()).ifPresent(settings -> {
+        if (settings.hasStaffAlerts()) {
+          player.sendMessage(component);
+        }
+      });
     }
   }
 
