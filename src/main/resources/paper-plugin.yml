@@ -3,7 +3,7 @@ version: ${version}
 main: io.github.leonesoj.honey.Honey
 description: A streamlined backend for modern Minecraft servers.
 authors: [ Termxs ]
-api-version: '1.21.8'
+api-version: '1.21.9'
 loader: io.github.leonesoj.honey.HoneyLoader
 bootstrapper: io.github.leonesoj.honey.HoneyBootstrap
 dependencies:
