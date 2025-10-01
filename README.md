@@ -2,7 +2,7 @@
 
 # Honey - A streamlined backend for modern Minecraft servers.
 
-![](https://img.shields.io/badge/Paper%20API-1.21.8-black?style=for-the-badge&labelColor=%23D3D3D3&color=%23ffa142) ![](https://img.shields.io/badge/PRs-welcome-black?style=for-the-badge&labelColor=%23D3D3D3&color=%23ffa142) ![](https://img.shields.io/badge/License-MIT-black?style=for-the-badge&labelColor=%23D3D3D3&color=%23ffa142)
+![](https://img.shields.io/badge/Paper%20API-1.21.9-black?style=for-the-badge&labelColor=%23D3D3D3&color=%23ffa142) ![](https://img.shields.io/badge/PRs-welcome-black?style=for-the-badge&labelColor=%23D3D3D3&color=%23ffa142) ![](https://img.shields.io/badge/License-MIT-black?style=for-the-badge&labelColor=%23D3D3D3&color=%23ffa142)
 ![modrinth](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/available/modrinth_vector.svg)![paper](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/supported/paper_vector.svg)
 
 
