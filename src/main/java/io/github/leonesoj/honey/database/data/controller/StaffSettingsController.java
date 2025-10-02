@@ -79,6 +79,7 @@ public class StaffSettingsController extends DataController<StaffSettings> imple
         false,
         true,
         false,
+        true,
         true
     );
   }

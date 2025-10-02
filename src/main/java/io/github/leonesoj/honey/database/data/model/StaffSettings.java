@@ -18,6 +18,7 @@ public class StaffSettings implements DataModel {
   private static final String REPORT_ALERTS_FIELD = "report_alerts";
   private static final String PERSIST_STAFF_MODE_FIELD = "persist_staff_mode";
   private static final String STAFF_ALERTS_FIELD = "staff_alerts";
+  private static final String CHAT_MODERATION_FIELD = "chat_moderation";
 
   public static final String STORAGE_KEY = "staff_settings";
   public static final String PRIMARY_KEY = UUID_FIELD;
@@ -29,7 +30,8 @@ public class StaffSettings implements DataModel {
       SOCIALSPY_FIELD, FieldType.BOOLEAN,
       REPORT_ALERTS_FIELD, FieldType.BOOLEAN,
       PERSIST_STAFF_MODE_FIELD, FieldType.BOOLEAN,
-      STAFF_ALERTS_FIELD, FieldType.BOOLEAN
+      STAFF_ALERTS_FIELD, FieldType.BOOLEAN,
+      CHAT_MODERATION_FIELD, FieldType.BOOLEAN
   );
 
   private final UUID uuid;
@@ -40,9 +42,10 @@ public class StaffSettings implements DataModel {
   private boolean reportAlerts;
   private boolean persistStaffMode;
   private boolean staffAlerts;
+  private boolean chatModeration;
 
   public StaffSettings(UUID uuid, boolean staffMode, boolean visibleStaff, boolean socialSpy,
-      boolean reportAlerts, boolean persistStaffMode, boolean staffAlerts) {
+      boolean reportAlerts, boolean persistStaffMode, boolean staffAlerts, boolean chatModeration) {
     this.uuid = uuid;
     this.staffMode = staffMode;
     this.visibleStaff = visibleStaff;
@@ -50,6 +53,7 @@ public class StaffSettings implements DataModel {
     this.reportAlerts = reportAlerts;
     this.persistStaffMode = persistStaffMode;
     this.staffAlerts = staffAlerts;
+    this.chatModeration = chatModeration;
   }
 
   public UUID getUniqueId() {
@@ -104,6 +108,14 @@ public class StaffSettings implements DataModel {
     staffAlerts = !staffAlerts;
   }
 
+  public boolean inChatModerationMode() {
+    return chatModeration;
+  }
+
+  public void setChatModeration(boolean chatModeration) {
+    this.chatModeration = chatModeration;
+  }
+
   @Override
   public Map<String, Object> serialize() {
     Map<String, Object> map = new HashMap<>();
@@ -115,6 +127,7 @@ public class StaffSettings implements DataModel {
     map.put(REPORT_ALERTS_FIELD, reportAlerts);
     map.put(PERSIST_STAFF_MODE_FIELD, persistStaffMode);
     map.put(STAFF_ALERTS_FIELD, staffAlerts);
+    map.put(CHAT_MODERATION_FIELD, chatModeration);
 
     return map;
   }
@@ -127,7 +140,8 @@ public class StaffSettings implements DataModel {
         record.get(SOCIALSPY_FIELD, SCHEMA.get(SOCIALSPY_FIELD)),
         record.get(REPORT_ALERTS_FIELD, SCHEMA.get(REPORT_ALERTS_FIELD)),
         record.get(PERSIST_STAFF_MODE_FIELD, SCHEMA.get(PERSIST_STAFF_MODE_FIELD)),
-        record.get(STAFF_ALERTS_FIELD, SCHEMA.get(STAFF_ALERTS_FIELD))
+        record.get(STAFF_ALERTS_FIELD, SCHEMA.get(STAFF_ALERTS_FIELD)),
+        record.get(CHAT_MODERATION_FIELD, SCHEMA.get(CHAT_MODERATION_FIELD))
     );
   }
 
@@ -142,6 +156,7 @@ public class StaffSettings implements DataModel {
     json.put(REPORT_ALERTS_FIELD, JsonUtil.toJsonBoolean(reportAlerts, parser));
     json.put(PERSIST_STAFF_MODE_FIELD, JsonUtil.toJsonBoolean(persistStaffMode, parser));
     json.put(STAFF_ALERTS_FIELD, JsonUtil.toJsonBoolean(staffAlerts, parser));
+    json.put(CHAT_MODERATION_FIELD, JsonUtil.toJsonBoolean(chatModeration, parser));
 
     return json;
   }
@@ -154,7 +169,8 @@ public class StaffSettings implements DataModel {
         json.get(SOCIALSPY_FIELD).asBoolean(),
         json.get(REPORT_ALERTS_FIELD).asBoolean(),
         json.get(PERSIST_STAFF_MODE_FIELD).asBoolean(),
-        json.get(STAFF_ALERTS_FIELD).asBoolean()
+        json.get(STAFF_ALERTS_FIELD).asBoolean(),
+        json.get(CHAT_MODERATION_FIELD).asBoolean()
     );
   }
 }

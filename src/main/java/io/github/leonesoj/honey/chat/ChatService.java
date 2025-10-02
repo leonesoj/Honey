@@ -8,6 +8,7 @@ import io.github.leonesoj.honey.utils.other.DurationUtil;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import net.kyori.adventure.audience.Audience;
@@ -24,6 +25,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class ChatService implements Listener {
 
   private final ConcurrentHashMap<String, ChatChannel> channels = new ConcurrentHashMap<>();
+
+  private final Set<UUID> chatMods = ConcurrentHashMap.newKeySet();
 
   private final PrivateChatService privateChatService;
   private final SpyService spyService;
@@ -124,6 +127,24 @@ public class ChatService implements Listener {
     return optional.isPresent() && spyService.isGlobalSpy(optional.get());
   }
 
+  public void setChatModStatus(UUID uuid, boolean status) {
+    if (status) {
+      chatMods.add(uuid);
+    } else {
+      chatMods.remove(uuid);
+    }
+
+    Honey.getInstance().getDataHandler().getStaffSettingsController()
+        .modifySettings(uuid, settings -> {
+          settings.setChatModeration(status);
+          return settings;
+        });
+  }
+
+  public boolean isChatMod(UUID uuid) {
+    return chatMods.contains(uuid);
+  }
+
   public ChatChannel getMemberChannel(Audience audience) {
     for (ChatChannel channel : channels.values()) {
       if (channel.hasParticipant(audience)) {
@@ -210,6 +231,9 @@ public class ChatService implements Listener {
     event.viewers().removeIf(audience ->
         !chatChannel.hasMember(audience) && !isSpy(audience)
     );
-    event.renderer(HoneyChatRenderer.getInstance());
+    event.renderer((source, sourceDisplayName, message, viewer) ->
+        HoneyChatRenderer.getInstance()
+            .render(source, sourceDisplayName, message, viewer, event.signedMessage(), this)
+    );
   }
 }
