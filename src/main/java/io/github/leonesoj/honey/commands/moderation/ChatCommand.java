@@ -8,6 +8,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.chat.ChatChannel;
+import io.github.leonesoj.honey.chat.ChatService;
 import io.github.leonesoj.honey.utils.command.DurationArgument;
 import io.github.leonesoj.honey.utils.other.DurationUtil;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -32,6 +33,7 @@ public class ChatCommand {
         .then(Commands.literal("unslow").executes(ChatCommand::unSlowUsage))
         .then(Commands.literal("clear").executes(ChatCommand::clearHereUsage))
         .then(Commands.literal("logs"))
+        .then(Commands.literal("mod").executes(ChatCommand::modUsage))
         .build();
   }
 
@@ -165,6 +167,21 @@ public class ChatCommand {
         argComponent("player", sender.getName()),
         argComponent("channel", channel.getIdentifier())
     ));
+    return Command.SINGLE_SUCCESS;
+  }
+
+  private static int modUsage(CommandContext<CommandSourceStack> ctx) {
+    Player sender = (Player) ctx.getSource().getSender();
+    ChatService chatService = Honey.getInstance().getChatService();
+
+    if (!chatService.isChatMod(sender.getUniqueId())) {
+      chatService.setChatModStatus(sender.getUniqueId(), true);
+      sender.sendMessage(prefixed("honey.chat.mod.enabled"));
+    } else {
+      chatService.setChatModStatus(sender.getUniqueId(), false);
+      sender.sendMessage(prefixed("honey.chat.mod.disabled"));
+    }
+
     return Command.SINGLE_SUCCESS;
   }
 

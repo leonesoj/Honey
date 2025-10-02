@@ -157,3 +157,17 @@ staff_settings:
           - ""
           - "<i><yellow>Click to toggle</yellow></i>"
       sound: block.lever.click
+    chat_mod:
+      type: oak_sign
+      slot: 32
+      display_name:
+        en-US: "<light_purple>Chat Mod</light_purple>"
+      lore:
+        en-US:
+          - "<gray>Toggle whether or not you want</gray>"
+          - "<gray>to see the chat deletion button</gray>"
+          - "<gray>on player signed messages</gray>"
+          - ""
+          - "<gray>Currently:</gray> %status%"
+          - ""
+          - "<i><yellow>Click to toggle</yellow></i>"

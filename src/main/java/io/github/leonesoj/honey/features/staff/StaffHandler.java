@@ -159,7 +159,9 @@ public class StaffHandler implements Listener {
         if (settings.hasSocialSpy()) {
           spyService.toggleGlobalSpy(player.getUniqueId());
         }
-
+        if (settings.inChatModerationMode()) {
+          Honey.getInstance().getChatService().setChatModStatus(player.getUniqueId(), true);
+        }
       }
 
       broadcastToStaff(

@@ -1,19 +1,24 @@
 package io.github.leonesoj.honey.chat;
 
-import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.utils.other.DependCheck;
-import io.github.leonesoj.honey.utils.other.PlaceholderUtil;
-import io.papermc.paper.chat.ChatRenderer;
+import java.util.Optional;
+import java.util.UUID;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.chat.SignedMessage;
+import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.cacheddata.CachedMetaData;
+import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-public class HoneyChatRenderer implements ChatRenderer {
+public class HoneyChatRenderer {
 
   private static final String DISPLAY_NAME_PLACEHOLDER = "display_name";
   private static final String USERNAME_PLACEHOLDER = "username";
@@ -36,34 +41,46 @@ public class HoneyChatRenderer implements ChatRenderer {
   private HoneyChatRenderer() {
   }
 
-  @Override
   public Component render(Player source, Component sourceDisplayName, Component message,
-      Audience viewer) {
-    ChatService chatService = Honey.getInstance().getChatService();
-    ChatChannel sourceChannel = chatService.getMemberChannel(source);
+      Audience viewer, SignedMessage signedMessage, ChatService chatService) {
+    Component base = Component.empty();
 
+    ChatChannel sourceChannel = chatService.getMemberChannel(source);
+    if (viewer instanceof ConsoleCommandSender) {
+      base = base.append(Component.text("(" + sourceChannel.getIdentifier() + ") "));
+    }
+
+    Optional<UUID> viewerUUID = viewer.get(Identity.UUID);
+    if (viewerUUID.isPresent() && chatService.isChatMod(viewerUUID.get())) {
+      Component deleteButton = Component.textOfChildren(
+          Component.text("[", NamedTextColor.DARK_GRAY),
+          Component.text("✖", NamedTextColor.RED).clickEvent(
+              ClickEvent.callback(audience -> Bukkit.getServer().deleteMessage(signedMessage))
+          ),
+          Component.text("]", NamedTextColor.DARK_GRAY),
+          Component.space()
+      );
+      base = base.append(deleteButton);
+    }
+
+    String format = sourceChannel.getFormat();
     if (DependCheck.isPlaceholderApiInstalled()) {
-      message = PlaceholderUtil.applyPlaceholders(source, message);
+      format = PlaceholderAPI.setPlaceholders(source, format);
     }
 
     CachedMetaData metaData = LuckPermsProvider.get()
         .getPlayerAdapter(Player.class)
         .getMetaData(source);
-
-    Component result = MiniMessage.miniMessage().deserialize(sourceChannel.getFormat(),
+    Component body = MiniMessage.miniMessage().deserialize(format,
         Placeholder.component(DISPLAY_NAME_PLACEHOLDER, sourceDisplayName),
         Placeholder.component(USERNAME_PLACEHOLDER, Component.text(source.getName())),
         Placeholder.component(CHAT_MESSAGE_PLACEHOLDER, message),
         Placeholder.component(PREFIX_PLACEHOLDER, componentOrEmpty(metaData.getPrefix())),
         Placeholder.component(SUFFIX_PLACEHOLDER, componentOrEmpty(metaData.getSuffix()))
     );
+    base = base.append(body);
 
-    Component channelPrefix = Component.empty();
-    if (viewer instanceof ConsoleCommandSender) {
-      channelPrefix = Component.text("(" + sourceChannel.getIdentifier() + ") ");
-    }
-
-    return channelPrefix.append(result);
+    return base;
   }
 
   private Component componentOrEmpty(String string) {

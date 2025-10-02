@@ -51,6 +51,8 @@ public class StaffSettingsInventory extends SerializedInventory {
           toggle(settings, SettingType.REPORT_ALERTS));
       addItem(prepareItem(SettingType.STAFF_ALERTS, settings.hasStaffAlerts()),
           toggle(settings, SettingType.STAFF_ALERTS));
+      addItem(prepareItem(SettingType.CHAT_MOD, settings.inChatModerationMode()),
+          toggle(settings, SettingType.CHAT_MOD));
     } else {
       InventoryDecorator.createErrorScreen(this, null);
     }
@@ -82,6 +84,11 @@ public class StaffSettingsInventory extends SerializedInventory {
         case PERSIST_STAFF_MODE -> settings.togglePersistStaffMode();
         case REPORT_ALERTS -> settings.toggleReportAlerts();
         case STAFF_ALERTS -> settings.toggleStaffAlerts();
+        case CHAT_MOD -> {
+          boolean newStatus = !settings.inChatModerationMode();
+          settings.setChatModeration(newStatus);
+          Honey.getInstance().getChatService().setChatModStatus(uuid, newStatus);
+        }
       }
 
       controller.updateSettingsSync(settings)
@@ -98,6 +105,7 @@ public class StaffSettingsInventory extends SerializedInventory {
                 case PERSIST_STAFF_MODE -> status = settings.shouldPersistStaffMode();
                 case REPORT_ALERTS -> status = settings.hasReportAlerts();
                 case STAFF_ALERTS -> status = settings.hasStaffAlerts();
+                case CHAT_MOD -> status = settings.inChatModerationMode();
               }
               event.setCurrentItem(prepareItem(type, status).item().build());
             }
@@ -124,7 +132,8 @@ public class StaffSettingsInventory extends SerializedInventory {
     SOCIAL_SPY,
     PERSIST_STAFF_MODE,
     REPORT_ALERTS,
-    STAFF_ALERTS
+    STAFF_ALERTS,
+    CHAT_MOD
   }
 
 
