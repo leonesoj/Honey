@@ -191,6 +191,7 @@ public class ChatService implements Listener {
 
   @EventHandler
   public void onLeave(PlayerQuitEvent event) {
+    chatMods.remove(event.getPlayer().getUniqueId());
     channels.values().forEach(chatChannel -> {
       if (chatChannel.hasParticipant(event.getPlayer())) {
         leaveChannel(chatChannel.getIdentifier(), event.getPlayer());
