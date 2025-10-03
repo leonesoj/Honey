@@ -50,8 +50,8 @@ public class HoneyChatRenderer {
       base = base.append(Component.text("(" + sourceChannel.getIdentifier() + ") "));
     }
 
-    Optional<UUID> viewerUUID = viewer.get(Identity.UUID);
-    if (viewerUUID.isPresent() && chatService.isChatMod(viewerUUID.get())) {
+    Optional<UUID> viewerUuid = viewer.get(Identity.UUID);
+    if (viewerUuid.isPresent() && chatService.isChatMod(viewerUuid.get())) {
       Component deleteButton = Component.textOfChildren(
           Component.text("[", NamedTextColor.DARK_GRAY),
           Component.text("✖", NamedTextColor.RED).clickEvent(

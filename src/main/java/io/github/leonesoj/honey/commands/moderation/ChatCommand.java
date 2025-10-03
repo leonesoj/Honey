@@ -9,11 +9,15 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.chat.ChatChannel;
 import io.github.leonesoj.honey.chat.ChatService;
+import io.github.leonesoj.honey.chat.SpyService;
 import io.github.leonesoj.honey.utils.command.DurationArgument;
+import io.github.leonesoj.honey.utils.command.OtherPlayerArgument;
 import io.github.leonesoj.honey.utils.other.DurationUtil;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import java.time.Duration;
+import java.util.Set;
+import java.util.UUID;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.text.Component;
@@ -34,6 +38,9 @@ public class ChatCommand {
         .then(Commands.literal("clear").executes(ChatCommand::clearHereUsage))
         .then(Commands.literal("logs"))
         .then(Commands.literal("mod").executes(ChatCommand::modUsage))
+        .then(Commands.literal("spy").executes(ChatCommand::spyUsage)
+            .then(Commands.argument("player", new OtherPlayerArgument(true))
+                .executes(ChatCommand::spyTargetUsage)))
         .build();
   }
 
@@ -185,4 +192,42 @@ public class ChatCommand {
     return Command.SINGLE_SUCCESS;
   }
 
+  private static int spyUsage(CommandContext<CommandSourceStack> ctx) {
+    Player sender = (Player) ctx.getSource().getSender();
+
+    boolean newStatus = Honey.getInstance().getChatService()
+        .getSpyService()
+        .toggleGlobalSpy(sender.getUniqueId());
+    if (newStatus) {
+      sender.sendMessage(prefixed("honey.socialspy.enabled"));
+    } else {
+      sender.sendMessage(prefixed("honey.socialspy.disabled"));
+    }
+
+    return Command.SINGLE_SUCCESS;
+  }
+
+  private static int spyTargetUsage(CommandContext<CommandSourceStack> ctx) {
+    Player sender = (Player) ctx.getSource().getSender();
+    Player target = ctx.getArgument("player", Player.class);
+
+    UUID senderId = sender.getUniqueId();
+    UUID targetId = target.getUniqueId();
+
+    SpyService spyService = Honey.getInstance().getChatService().getSpyService();
+
+    Set<UUID> currentTargets = spyService.getTargetsOfSpy(senderId);
+    if (!currentTargets.contains(targetId)) {
+      spyService.trackAsSpy(senderId, targetId);
+      sender.sendMessage(prefixed("honey.spy.enabled",
+          argComponent("player", target.getName()))
+      );
+    } else {
+      spyService.untrackSpyTarget(senderId, targetId);
+      sender.sendMessage(prefixed("honey.spy.disabled",
+          argComponent("player", target.getName()))
+      );
+    }
+    return Command.SINGLE_SUCCESS;
+  }
 }

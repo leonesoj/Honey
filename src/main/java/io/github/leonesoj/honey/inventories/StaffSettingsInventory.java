@@ -1,6 +1,7 @@
 package io.github.leonesoj.honey.inventories;
 
 import io.github.leonesoj.honey.Honey;
+import io.github.leonesoj.honey.chat.ChatService;
 import io.github.leonesoj.honey.database.data.controller.StaffSettingsController;
 import io.github.leonesoj.honey.database.data.model.StaffSettings;
 import io.github.leonesoj.honey.features.staff.StaffHandler;
@@ -62,6 +63,7 @@ public class StaffSettingsInventory extends SerializedInventory {
     return event -> {
       Player player = (Player) event.getWhoClicked();
       StaffHandler staffHandler = Honey.getInstance().getStaffHandler();
+      ChatService chatService = Honey.getInstance().getChatService();
 
       switch (type) {
         case SHOW_STAFF -> {
@@ -78,8 +80,8 @@ public class StaffSettingsInventory extends SerializedInventory {
         }
         case SOCIAL_SPY -> {
           boolean newStatus = !settings.hasSocialSpy();
-          staffHandler.getSpyService().setSpyStatus(uuid, newStatus);
           settings.setSocialSpy(!settings.hasSocialSpy());
+          chatService.getSpyService().setSpyStatus(uuid, newStatus);
         }
         case PERSIST_STAFF_MODE -> settings.togglePersistStaffMode();
         case REPORT_ALERTS -> settings.toggleReportAlerts();
@@ -87,7 +89,7 @@ public class StaffSettingsInventory extends SerializedInventory {
         case CHAT_MOD -> {
           boolean newStatus = !settings.inChatModerationMode();
           settings.setChatModeration(newStatus);
-          Honey.getInstance().getChatService().setChatModStatus(uuid, newStatus);
+          chatService.setChatModStatus(uuid, newStatus);
         }
       }
 

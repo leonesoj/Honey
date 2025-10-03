@@ -58,7 +58,7 @@ public final class Honey extends JavaPlugin {
 
     staffHandler = new StaffHandler(dataHandler.getStaffSettingsController());
 
-    chatService = new ChatService(staffHandler.getSpyService());
+    chatService = new ChatService();
     registerDefaultChannels();
 
     translationHandler = new TranslationHandler(this);
