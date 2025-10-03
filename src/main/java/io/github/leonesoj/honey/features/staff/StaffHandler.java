@@ -3,7 +3,7 @@ package io.github.leonesoj.honey.features.staff;
 import static io.github.leonesoj.honey.locale.Message.argComponent;
 
 import io.github.leonesoj.honey.Honey;
-import io.github.leonesoj.honey.chat.SpyService;
+import io.github.leonesoj.honey.chat.ChatService;
 import io.github.leonesoj.honey.database.data.controller.StaffSettingsController;
 import io.github.leonesoj.honey.database.data.model.StaffSettings;
 import io.github.leonesoj.honey.database.data.model.StaffState;
@@ -33,7 +33,6 @@ public class StaffHandler implements Listener {
   private final StaffSettingsController settingsController;
 
   private final VanishService vanishService;
-  private final SpyService spyService;
 
   private final StaffItems staffItems;
 
@@ -41,7 +40,6 @@ public class StaffHandler implements Listener {
     this.settingsController = settingsController;
     this.vanishService = new VanishService(settingsController);
     this.staffItems = new StaffItems(this);
-    this.spyService = new SpyService();
 
     ConfigurationSerialization.registerClass(StaffState.class);
 
@@ -156,11 +154,14 @@ public class StaffHandler implements Listener {
         } else if (!settings.hasVisibleStaff() && !settings.inStaffMode()) {
           vanishService.hideAllVanishedFor(player);
         }
+
+        ChatService chatService = Honey.getInstance().getChatService();
+
         if (settings.hasSocialSpy()) {
-          spyService.toggleGlobalSpy(player.getUniqueId());
+          chatService.getSpyService().setSpyStatus(player.getUniqueId(), true);
         }
         if (settings.inChatModerationMode()) {
-          Honey.getInstance().getChatService().setChatModStatus(player.getUniqueId(), true);
+          chatService.setChatModStatus(player.getUniqueId(), true);
         }
       }
 
@@ -229,7 +230,4 @@ public class StaffHandler implements Listener {
     return vanishService;
   }
 
-  public SpyService getSpyService() {
-    return spyService;
-  }
 }

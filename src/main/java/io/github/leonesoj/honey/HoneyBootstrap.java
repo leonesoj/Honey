@@ -32,8 +32,6 @@ import io.github.leonesoj.honey.commands.messaging.UnignoreCommand;
 import io.github.leonesoj.honey.commands.moderation.BanCommand;
 import io.github.leonesoj.honey.commands.moderation.ChatCommand;
 import io.github.leonesoj.honey.commands.moderation.InvseeCommand;
-import io.github.leonesoj.honey.commands.moderation.SocialSpyCommand;
-import io.github.leonesoj.honey.commands.moderation.SpyCommand;
 import io.github.leonesoj.honey.commands.moderation.StaffCommand;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
@@ -88,8 +86,6 @@ public class HoneyBootstrap implements PluginBootstrap {
       /* MODERATION COMMANDS */
       commands.registrar().register(BanCommand.create());
       commands.registrar().register(StaffCommand.create());
-      commands.registrar().register(SocialSpyCommand.create());
-      commands.registrar().register(SpyCommand.create());
       commands.registrar().register(ChatCommand.create());
     });
   }

@@ -33,8 +33,8 @@ public class ChatService implements Listener {
 
   private ChatChannel defaultChannel;
 
-  public ChatService(SpyService spyService) {
-    this.spyService = spyService;
+  public ChatService() {
+    this.spyService = new SpyService();
     this.privateChatService = new PrivateChatService(spyService);
     Bukkit.getPluginManager().registerEvents(this, Honey.getInstance());
   }
@@ -174,6 +174,10 @@ public class ChatService implements Listener {
 
   public PrivateChatService getPrivateChatService() {
     return privateChatService;
+  }
+
+  public SpyService getSpyService() {
+    return spyService;
   }
 
   @EventHandler
