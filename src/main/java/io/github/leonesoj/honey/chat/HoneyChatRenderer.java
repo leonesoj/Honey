@@ -1,5 +1,11 @@
 package io.github.leonesoj.honey.chat;
 
+import io.github.leonesoj.honey.Honey;
+import io.github.leonesoj.honey.chat.variables.ItemVariable;
+import io.github.leonesoj.honey.chat.variables.LocationVariable;
+import io.github.leonesoj.honey.chat.variables.PingVariable;
+import io.github.leonesoj.honey.chat.variables.VariableRegistry;
+import io.github.leonesoj.honey.config.Config;
 import io.github.leonesoj.honey.utils.other.DependCheck;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,6 +32,11 @@ public class HoneyChatRenderer {
   private static final String PREFIX_PLACEHOLDER = "prefix";
   private static final String SUFFIX_PLACEHOLDER = "suffix";
   private static final String PRIMARY_GROUP_PLACEHOLDER = "group";
+
+  private static final VariableRegistry VARIABLE_REGISTRY = new VariableRegistry()
+      .register(new ItemVariable())
+      .register(new LocationVariable())
+      .register(new PingVariable());
 
   private static final MiniMessage miniMessage = MiniMessage.miniMessage();
 
@@ -66,6 +77,13 @@ public class HoneyChatRenderer {
     String format = sourceChannel.getFormat();
     if (DependCheck.isPlaceholderApiInstalled()) {
       format = PlaceholderAPI.setPlaceholders(source, format);
+    }
+
+    Config config = Honey.getInstance().config();
+    if (config.getBoolean("chat.variables.enabled")) {
+      message = VARIABLE_REGISTRY.applyAll(message, source,
+          config.getBoolean("chat.variables.require_permission")
+      );
     }
 
     CachedMetaData metaData = LuckPermsProvider.get()
