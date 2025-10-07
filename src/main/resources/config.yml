@@ -78,6 +78,9 @@ chat:
     format:
       command: <gray><<light_purple>#</light_purple>> <player>:</gray> <command>
       private_message: <gray><<aqua>✉</aqua>> (<player> » <recipient>):</gray> <message>
+  variables:
+    enabled: true
+    require_permission: false
 
 reports:
   # Amount of time a user must wait before submitting another successful report in seconds.
