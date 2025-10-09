@@ -1,11 +1,13 @@
 package io.github.leonesoj.honey.chat;
 
 import io.github.leonesoj.honey.Honey;
+import io.github.leonesoj.honey.chat.filtering.ChatFilter.Result;
 import io.github.leonesoj.honey.chat.variables.ItemVariable;
 import io.github.leonesoj.honey.chat.variables.LocationVariable;
 import io.github.leonesoj.honey.chat.variables.PingVariable;
 import io.github.leonesoj.honey.chat.variables.VariableRegistry;
 import io.github.leonesoj.honey.config.Config;
+import io.github.leonesoj.honey.database.data.model.PlayerSettings;
 import io.github.leonesoj.honey.utils.other.DependCheck;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,7 +55,7 @@ public class HoneyChatRenderer {
   }
 
   public Component render(Player source, Component sourceDisplayName, Component message,
-      Audience viewer, SignedMessage signedMessage, ChatService chatService) {
+      Audience viewer, SignedMessage signedMessage, Result chatResult, ChatService chatService) {
     Component base = Component.empty();
 
     ChatChannel sourceChannel = chatService.getMemberChannel(source);
@@ -61,17 +63,28 @@ public class HoneyChatRenderer {
       base = base.append(Component.text("(" + sourceChannel.getIdentifier() + ") "));
     }
 
-    Optional<UUID> viewerUuid = viewer.get(Identity.UUID);
-    if (viewerUuid.isPresent() && chatService.isChatMod(viewerUuid.get())) {
-      Component deleteButton = Component.textOfChildren(
-          Component.text("[", NamedTextColor.DARK_GRAY),
-          Component.text("✖", NamedTextColor.RED).clickEvent(
-              ClickEvent.callback(audience -> Bukkit.getServer().deleteMessage(signedMessage))
-          ),
-          Component.text("]", NamedTextColor.DARK_GRAY),
-          Component.space()
-      );
-      base = base.append(deleteButton);
+    Optional<UUID> optional = viewer.get(Identity.UUID);
+    if (optional.isPresent()) {
+      UUID viewerUuid = optional.get();
+
+      if (chatService.isChatMod(viewerUuid)) {
+        Component deleteButton = Component.textOfChildren(
+            Component.text("[", NamedTextColor.DARK_GRAY),
+            Component.text("✖", NamedTextColor.RED).clickEvent(
+                ClickEvent.callback(audience -> Bukkit.getServer().deleteMessage(signedMessage))
+            ),
+            Component.text("]", NamedTextColor.DARK_GRAY),
+            Component.space()
+        );
+        base = base.append(deleteButton);
+      } else {
+        Optional<PlayerSettings> viewerSettings = Honey.getInstance().getDataHandler()
+            .getSettingsController().getSettings(viewerUuid);
+        if (viewerSettings.isPresent() && viewerSettings.get().hasProfanityFilter()) {
+          message = chatResult.censoredText();
+        }
+      }
+
     }
 
     String format = sourceChannel.getFormat();
