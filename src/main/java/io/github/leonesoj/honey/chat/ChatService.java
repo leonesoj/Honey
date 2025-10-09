@@ -3,9 +3,14 @@ package io.github.leonesoj.honey.chat;
 import static io.github.leonesoj.honey.locale.Message.argComponent;
 
 import io.github.leonesoj.honey.Honey;
+import io.github.leonesoj.honey.chat.MessageGuard.CheckResult;
+import io.github.leonesoj.honey.chat.filtering.ChatFilter;
+import io.github.leonesoj.honey.chat.filtering.ChatFilter.Result;
+import io.github.leonesoj.honey.chat.filtering.ForbiddenWords;
 import io.github.leonesoj.honey.chat.messaging.PrivateChatService;
 import io.github.leonesoj.honey.utils.other.DurationUtil;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
@@ -24,6 +29,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class ChatService implements Listener {
 
+  private static final Duration CHAT_COOLDOWN = Duration.ofSeconds(3);
+  private static final int MAX_CHAT_DUPE = 3;
+
   private final ConcurrentHashMap<String, ChatChannel> channels = new ConcurrentHashMap<>();
 
   private final Set<UUID> chatMods = ConcurrentHashMap.newKeySet();
@@ -31,11 +39,15 @@ public class ChatService implements Listener {
   private final PrivateChatService privateChatService;
   private final SpyService spyService;
 
+  private final ChatFilter filter;
+  private final MessageGuard messageGuard = new MessageGuard(CHAT_COOLDOWN, MAX_CHAT_DUPE);
+
   private ChatChannel defaultChannel;
 
   public ChatService() {
     this.spyService = new SpyService();
     this.privateChatService = new PrivateChatService(spyService);
+    this.filter = new ChatFilter(ForbiddenWords.load(Honey.getInstance()));
     Bukkit.getPluginManager().registerEvents(this, Honey.getInstance());
   }
 
@@ -189,16 +201,6 @@ public class ChatService implements Listener {
     });
   }
 
-  @EventHandler
-  public void onLeave(PlayerQuitEvent event) {
-    chatMods.remove(event.getPlayer().getUniqueId());
-    channels.values().forEach(chatChannel -> {
-      if (chatChannel.hasParticipant(event.getPlayer())) {
-        leaveChannel(chatChannel.getIdentifier(), event.getPlayer());
-      }
-    });
-  }
-
   @EventHandler(priority = EventPriority.LOWEST)
   public void onChat(AsyncChatEvent event) {
     Player player = event.getPlayer();
@@ -233,12 +235,75 @@ public class ChatService implements Listener {
       }
     }
 
+    String raw = event.signedMessage().message();
+
+    CheckResult guard = messageGuard.check(player.getUniqueId(), raw);
+    switch (guard.violation()) {
+      case COOLDOWN -> {
+        if (!player.hasPermission("honey.chat.bypass.cooldown")) {
+          double secs = guard.remainingMillis() / 1000.0;
+          String pretty = String.format(java.util.Locale.US, "%.2f", secs);
+          player.sendMessage(Component.translatable(
+              "honey.channel.disallowed.cooldown",
+              argComponent("duration", pretty)
+          ));
+          event.setCancelled(true);
+          return;
+        }
+      }
+      case DUPLICATE -> {
+        if (!player.hasPermission("honey.chat.bypass.duplicate")) {
+          player.sendMessage(Component.translatable("honey.channel.disallowed.duplicate"));
+          event.setCancelled(true);
+          return;
+        }
+      }
+    }
+
+    Result result = filter.apply(raw);
+
+    switch (result.action()) {
+      case BLOCK_BAD_CHAR -> {
+        player.sendMessage(Component.translatable("honey.channel.disallowed.badchar"));
+        event.setCancelled(true);
+        return;
+      }
+      case BLOCK_URL -> {
+        player.sendMessage(Component.translatable("honey.channel.disallowed.url"));
+        event.setCancelled(true);
+        return;
+      }
+      case BLOCK_IP -> {
+        player.sendMessage(Component.translatable("honey.channel.disallowed.ip"));
+        event.setCancelled(true);
+        return;
+      }
+      case BLOCK_WORD -> {
+        player.sendMessage(Component.translatable("honey.channel.disallowed.forbidden"));
+        event.setCancelled(true);
+        return;
+      }
+      case CENSOR, ALLOW -> messageGuard.recordSuccess(player.getUniqueId(), raw);
+    }
+
     event.viewers().removeIf(audience ->
         !chatChannel.hasMember(audience) && !isSpy(audience)
     );
     event.renderer((source, sourceDisplayName, message, viewer) ->
         HoneyChatRenderer.getInstance()
-            .render(source, sourceDisplayName, message, viewer, event.signedMessage(), this)
+            .render(source, sourceDisplayName, message, viewer, event.signedMessage(), result, this)
     );
   }
+
+  @EventHandler
+  public void onLeave(PlayerQuitEvent event) {
+    chatMods.remove(event.getPlayer().getUniqueId());
+    messageGuard.clear(event.getPlayer().getUniqueId());
+    channels.values().forEach(chatChannel -> {
+      if (chatChannel.hasParticipant(event.getPlayer())) {
+        leaveChannel(chatChannel.getIdentifier(), event.getPlayer());
+      }
+    });
+  }
+
 }
