@@ -24,11 +24,19 @@ public class RedisCache extends CacheStore {
   private final StatefulRedisConnection<String, String> connection;
   private final RedisAsyncCommands<String, String> commands;
 
-  public RedisCache(String host, int port, String password, Logger logger) {
+  public RedisCache(String host,
+      int port,
+      String password,
+      boolean ssl,
+      String serverId,
+      Logger logger) {
     super(logger, CacheProvider.REDIS);
     this.redisClient = RedisClient.create(RedisURI.Builder.redis(host, port)
         .withPassword(password.toCharArray())
-        .withSsl(true).build());
+        .withClientName("HONEY-" + serverId)
+        .withSsl(ssl)
+        .build()
+    );
     // Nowhere in the Lettuce documentation does it say you have to do this when using Jackson
     this.redisClient.setOptions(ClientOptions.builder().jsonParser(DefaultJsonParser::new).build());
 
