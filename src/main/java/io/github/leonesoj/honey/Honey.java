@@ -50,7 +50,8 @@ public final class Honey extends JavaPlugin {
         getConfig().getString("database.provider"),
         getConfig().getConfigurationSection("database.config"),
         getConfig().getString("cache.provider"),
-        getConfig().getConfigurationSection("cache.redis_config")
+        getConfig().getConfigurationSection("cache.redis_config"),
+        getServerId()
     );
 
     secretHandler = new SecretHandler(this);

@@ -24,11 +24,11 @@ cache:
   # high memory usage. As in-memory cache stores all data in-memory.
   provider: "in-memory"
   # Upstash offers a very capable free Redis database with affordable paid options, if you need to scale
-  # If choose to use a different provider, make sure they support SSL.
   redis_config:
     host: ""
     port: 2025
     password: ""
+    ssl: true
 
 server:
   # This identifier must be unique across your entire network.

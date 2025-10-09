@@ -36,13 +36,14 @@ public class DataHandler {
       String databaseProvider,
       ConfigurationSection databaseConfig,
       String cacheProvider,
-      ConfigurationSection redisConfig) {
+      ConfigurationSection redisConfig,
+      String serverId) {
     this.plugin = plugin;
     this.databaseConfig = databaseConfig;
 
     this.dataStore = initDataStore(parseDataProvider(databaseProvider));
 
-    CacheInit cacheInit = initCaches(parseCacheProvider(cacheProvider), redisConfig);
+    CacheInit cacheInit = initCaches(parseCacheProvider(cacheProvider), redisConfig, serverId);
     this.nearCache = cacheInit.near();
     this.sharedCache = cacheInit.shared();
 
@@ -95,7 +96,8 @@ public class DataHandler {
 
   }
 
-  private CacheInit initCaches(CacheProvider provider, ConfigurationSection redis) {
+  private CacheInit initCaches(CacheProvider provider, ConfigurationSection redis,
+      String serverId) {
     CacheStore near = new InMemoryCache(plugin.getLogger());
     switch (provider) {
       case REDIS -> {
@@ -104,6 +106,8 @@ public class DataHandler {
               redis.getString("host"),
               redis.getInt("port"),
               redis.getString("password"),
+              redis.getBoolean("ssl"),
+              serverId,
               plugin.getLogger()
           );
           return new CacheInit(near, shared);
