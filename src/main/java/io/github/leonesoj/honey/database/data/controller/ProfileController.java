@@ -6,7 +6,6 @@ import io.github.leonesoj.honey.database.data.model.PlayerProfile;
 import io.github.leonesoj.honey.database.providers.DataStore;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -30,7 +29,7 @@ public class ProfileController extends DataController<PlayerProfile> implements 
             PlayerProfile.STORAGE_KEY,
             PlayerProfile.PRIMARY_INDEX,
             PlayerProfile.SCHEMA,
-            Collections.emptySet()
+            PlayerProfile.INDEXED_FIELDS
         ),
         NOOP_SHARED_INSTANCE,
         NOOP_SHARED_INSTANCE,

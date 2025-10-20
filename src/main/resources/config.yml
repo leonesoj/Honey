@@ -8,15 +8,14 @@
 # Wiki: https://github.com/leonesoj/honey/wiki
 
 database:
-  # Options: SQLite, (MySQL, and MongoDB: required on a Velocity network)
+  # Options: SQLite or MySQL(required on a Velocity network)
   provider: "SQLite"
   config:
-    address: ""
+    host: ""
     database: "honey"
     port: 2025
     username: ""
     password: ""
-    #connection_string: ""
 
 cache:
   # Options: In-Memory or Redis(required on a Velocity network)

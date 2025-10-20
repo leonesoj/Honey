@@ -5,7 +5,7 @@ import io.github.leonesoj.honey.database.record.FieldType;
 import io.lettuce.core.json.JsonObject;
 import io.lettuce.core.json.JsonParser;
 import java.time.Instant;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -119,7 +119,7 @@ public class Report implements DataModel {
 
   @Override
   public Map<String, Object> serialize() {
-    Map<String, Object> map = new HashMap<>();
+    Map<String, Object> map = new LinkedHashMap<>();
     map.put(ID_FIELD, id);
     map.put(ISSUER_FIELD, issuer);
     map.put(SUBJECT_FIELD, subject);

@@ -6,8 +6,8 @@ import io.github.leonesoj.honey.database.record.FieldType;
 import io.github.leonesoj.honey.utils.other.JsonUtil;
 import io.lettuce.core.json.JsonObject;
 import io.lettuce.core.json.JsonParser;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -101,7 +101,7 @@ public class PlayerSettings implements DataModel {
   }
 
   public Map<String, Object> serialize() {
-    Map<String, Object> map = new HashMap<>();
+    Map<String, Object> map = new LinkedHashMap<>();
 
     map.put(UUID_FIELD, uuid);
     map.put(PRIVATE_MESSAGES_FIELD, privateMessages);

@@ -28,8 +28,6 @@ dependencies {
     compileOnly 'io.lettuce:lettuce-core:6.5.5.RELEASE'
     compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
     compileOnly 'com.zaxxer:HikariCP:6.3.0'
-    compileOnly platform('org.mongodb:mongodb-driver-bom:5.4.0')
-    compileOnly 'org.mongodb:mongodb-driver-sync'
     compileOnly 'com.github.ben-manes.caffeine:caffeine:3.2.0'
     compileOnly 'org.bstats:bstats-bukkit:3.1.0'
     testImplementation 'org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.46.3'

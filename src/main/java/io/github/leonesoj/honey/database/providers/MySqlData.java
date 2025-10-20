@@ -4,7 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.leonesoj.honey.database.DataContainer;
 import io.github.leonesoj.honey.database.record.DataRecord;
-import io.github.leonesoj.honey.database.record.ResultSetRecord;
+import io.github.leonesoj.honey.database.record.impl.ResultSetRecord;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,9 +28,12 @@ public class MySqlData extends DataStore {
     super(logger, DataProvider.MYSQL);
 
     HikariConfig config = new HikariConfig();
-    config.setJdbcUrl("jdbc:mysql://" + host + ":" + port + "/" + database);
+    config.setJdbcUrl(
+        "jdbc:mysql://" + host + ":" + port + "/" + database + "?connectionTimeZone=UTC"
+    );
     config.setUsername(user);
     config.setPassword(password);
+    config.setPoolName("Honey");
 
     dataSource = new HikariDataSource(config);
 
@@ -53,9 +56,8 @@ public class MySqlData extends DataStore {
           PreparedStatement statement = connection.prepareStatement(insertCommand)) {
 
         int index = 1;
-        for (Map.Entry<String, Object> entry : data.entrySet()) {
-          statement.setObject(index++, entry.getValue(),
-              dataContainer.schema().get(entry.getKey()).getJdbcType());
+        for (Object value : data.values()) {
+          bindValue(statement, index++, value);
         }
 
         statement.executeUpdate();
@@ -77,10 +79,10 @@ public class MySqlData extends DataStore {
           PreparedStatement statement = connection.prepareStatement(updateCommand)) {
 
         int idx = 1;
-        for (Map.Entry<String, Object> entry : data.entrySet()) {
-          statement.setObject(idx++, entry.getValue(),
-              dataContainer.schema().get(entry.getKey()).getJdbcType());
+        for (Object objValue : data.values()) {
+          bindValue(statement, idx++, objValue);
         }
+        bindIndexParam(statement, idx, dataContainer, index, value);
 
         statement.executeUpdate();
         return true;
@@ -93,18 +95,18 @@ public class MySqlData extends DataStore {
 
   @Override
   public <T> CompletableFuture<Optional<T>> query(DataContainer dataContainer, String index,
-      String value, Function<DataRecord, T> mapper) {
+      Object value, Function<DataRecord, T> mapper) {
     String selectCommand = dataContainer.getSelectCommand(index);
 
     return CompletableFuture.supplyAsync(() -> {
       try (Connection connection = dataSource.getConnection();
           PreparedStatement statement = connection.prepareStatement(selectCommand)) {
 
-        statement.setString(1, value);
+        bindIndexParam(statement, 1, dataContainer, index, value);
 
         ResultSet resultSet = statement.executeQuery();
         if (resultSet.next()) {
-          return Optional.ofNullable(mapper.apply(new ResultSetRecord(resultSet)));
+          return Optional.ofNullable(mapper.apply(new ResultSetRecord(resultSet, getProvider())));
         }
 
         return Optional.empty();
@@ -117,7 +119,7 @@ public class MySqlData extends DataStore {
 
   @Override
   public <T> CompletableFuture<List<T>> queryMany(DataContainer dataContainer, String index,
-      String value, int limit, int offset, Function<DataRecord, T> mapper) {
+      Object value, int limit, int offset, Function<DataRecord, T> mapper) {
     String selectCommand = dataContainer.getSelectCommand(index, limit, offset);
 
     return CompletableFuture.supplyAsync(() -> {
@@ -125,10 +127,12 @@ public class MySqlData extends DataStore {
 
       try (Connection connection = dataSource.getConnection();
           PreparedStatement statement = connection.prepareStatement(selectCommand)) {
-        statement.setString(1, value);
+
+        bindIndexParam(statement, 1, dataContainer, index, value);
+
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()) {
-          result.add(mapper.apply(new ResultSetRecord(resultSet)));
+          result.add(mapper.apply(new ResultSetRecord(resultSet, getProvider())));
         }
       } catch (SQLException exception) {
         logQueryManyError(dataContainer.containerName(), index, value, limit, offset, exception);
@@ -141,15 +145,16 @@ public class MySqlData extends DataStore {
 
   @Override
   public CompletableFuture<Boolean> delete(DataContainer dataContainer, String index,
-      String value) {
+      Object value) {
     String deleteCommand = dataContainer.getDeleteCommand(index);
 
     return CompletableFuture.supplyAsync(() -> {
       try (Connection connection = dataSource.getConnection();
           PreparedStatement statement = connection.prepareStatement(deleteCommand)) {
-        statement.setString(1, value);
-        statement.executeUpdate();
 
+        bindIndexParam(statement, 1, dataContainer, index, value);
+
+        statement.executeUpdate();
         return true;
       } catch (SQLException exception) {
         logDeleteError(dataContainer.containerName(), index, value, exception);
@@ -160,12 +165,23 @@ public class MySqlData extends DataStore {
 
   @Override
   public void createDataStore(DataContainer dataContainer) {
-    String createCommand = dataContainer.getCreateCommand();
+    String createCommand = dataContainer.getCreateCommand(getProvider());
 
     try (Connection connection = dataSource.getConnection();
         Statement statement = connection.createStatement()) {
 
       statement.executeUpdate(createCommand);
+
+      for (String idxSql : dataContainer.getIndexCommands(getProvider())) {
+        try {
+          statement.executeUpdate(idxSql);
+        } catch (SQLException e) {
+          if (e.getErrorCode() != 1061) {
+            throw e;
+          }
+        }
+      }
+
     } catch (SQLException exception) {
       logCreateError(dataContainer.containerName(), exception);
     }

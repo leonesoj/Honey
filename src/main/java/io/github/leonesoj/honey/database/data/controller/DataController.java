@@ -81,7 +81,7 @@ public abstract class DataController<T extends DataModel> implements Listener {
             .thenApply(ok -> sharedOpt);
       }
 
-      return data.query(container, index, uuid.toString(), recordDeserializer)
+      return data.query(container, index, uuid, recordDeserializer)
           .thenCompose(dbOpt -> {
             if (dbOpt.isEmpty()) {
               return CompletableFuture.completedFuture(Optional.empty());
@@ -104,7 +104,7 @@ public abstract class DataController<T extends DataModel> implements Listener {
     return get(uuid, container.primaryIndex());
   }
 
-  protected CompletableFuture<List<T>> getMany(String index, String value, int limit, int offset) {
+  protected CompletableFuture<List<T>> getMany(String index, Object value, int limit, int offset) {
     return data.queryMany(container, index, value, limit, offset, recordDeserializer);
   }
 
