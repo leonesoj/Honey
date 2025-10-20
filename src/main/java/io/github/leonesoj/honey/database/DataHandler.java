@@ -11,7 +11,6 @@ import io.github.leonesoj.honey.database.data.controller.SettingsController;
 import io.github.leonesoj.honey.database.data.controller.StaffSettingsController;
 import io.github.leonesoj.honey.database.providers.DataProvider;
 import io.github.leonesoj.honey.database.providers.DataStore;
-import io.github.leonesoj.honey.database.providers.MongoData;
 import io.github.leonesoj.honey.database.providers.MySqlData;
 import io.github.leonesoj.honey.database.providers.SqliteData;
 import org.bukkit.configuration.ConfigurationSection;
@@ -72,15 +71,11 @@ public class DataHandler {
 
   private DataStore initDataStore(DataProvider provider) {
     return switch (provider) {
-      case MONGODB -> new MongoData(
-          databaseConfig.getString("connection_string"),
-          plugin.getLogger()
-      );
       case MYSQL -> new MySqlData(
           databaseConfig.getString("host"),
           databaseConfig.getInt("port"),
           databaseConfig.getString("database"),
-          databaseConfig.getString("user"),
+          databaseConfig.getString("username"),
           databaseConfig.getString("password"),
           plugin.getLogger()
       );
@@ -145,7 +140,6 @@ public class DataHandler {
   private static DataProvider parseDataProvider(String provider) {
     String string = normalize(provider);
     return switch (string) {
-      case "mongodb", "mongo" -> DataProvider.MONGODB;
       case "mysql" -> DataProvider.MYSQL;
       case "sqlite", "" -> DataProvider.SQLITE;
       default -> DataProvider.SQLITE;

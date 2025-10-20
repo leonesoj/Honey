@@ -2,7 +2,7 @@ package io.github.leonesoj.honey.database.providers;
 
 import io.github.leonesoj.honey.database.DataContainer;
 import io.github.leonesoj.honey.database.record.DataRecord;
-import io.github.leonesoj.honey.database.record.ResultSetRecord;
+import io.github.leonesoj.honey.database.record.impl.ResultSetRecord;
 import java.io.File;
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -72,7 +72,7 @@ public class SqliteData extends DataStore {
       try (PreparedStatement statement = writeConnection.prepareStatement(insertCommand)) {
         int index = 1;
         for (Object value : data.values()) {
-          statement.setObject(index++, value);
+          bindValue(statement, index++, value);
         }
 
         statement.executeUpdate();
@@ -101,9 +101,9 @@ public class SqliteData extends DataStore {
           dataContainer.getUpdateCommand(data, index))) {
         int idx = 1;
         for (Object value : data.values()) {
-          statement.setObject(idx++, value);
+          bindValue(statement, idx++, value);
         }
-        statement.setObject(idx, indexValue);
+        bindIndexParam(statement, idx, dataContainer, index, indexValue);
 
         statement.executeUpdate();
         return true;
@@ -116,16 +116,16 @@ public class SqliteData extends DataStore {
 
   @Override
   public <T> CompletableFuture<Optional<T>> query(DataContainer dataContainer, String index,
-      String value, Function<DataRecord, T> mapper) {
+      Object value, Function<DataRecord, T> mapper) {
     String selectCommand = dataContainer.getSelectCommand(index, 1, 0);
 
     return CompletableFuture.supplyAsync(() -> {
       try (PreparedStatement statement = readConnection.prepareStatement(selectCommand)) {
-        statement.setString(1, value);
+        bindIndexParam(statement, 1, dataContainer, index, value);
 
         try (ResultSet rs = statement.executeQuery()) {
           if (rs.next()) {
-            return Optional.ofNullable(mapper.apply(new ResultSetRecord(rs)));
+            return Optional.ofNullable(mapper.apply(new ResultSetRecord(rs, getProvider())));
           }
         }
 
@@ -140,17 +140,18 @@ public class SqliteData extends DataStore {
 
   @Override
   public <T> CompletableFuture<List<T>> queryMany(DataContainer dataContainer, String index,
-      String value, int limit, int offset, Function<DataRecord, T> mapper) {
+      Object value, int limit, int offset, Function<DataRecord, T> mapper) {
     String selectCommand = dataContainer.getSelectCommand(index, limit, offset);
 
     return CompletableFuture.supplyAsync(() -> {
       List<T> result = new ArrayList<>();
 
       try (PreparedStatement statement = readConnection.prepareStatement(selectCommand)) {
-        statement.setString(1, value);
+        bindIndexParam(statement, 1, dataContainer, index, value);
+
         try (ResultSet rs = statement.executeQuery()) {
           while (rs.next()) {
-            result.add(mapper.apply(new ResultSetRecord(rs)));
+            result.add(mapper.apply(new ResultSetRecord(rs, getProvider())));
           }
         }
       } catch (SQLException exception) {
@@ -164,12 +165,13 @@ public class SqliteData extends DataStore {
 
   @Override
   public CompletableFuture<Boolean> delete(DataContainer dataContainer, String index,
-      String value) {
+      Object value) {
     String deleteCommand = dataContainer.getDeleteCommand(index);
 
     return CompletableFuture.supplyAsync(() -> {
       try (PreparedStatement statement = writeConnection.prepareStatement(deleteCommand)) {
-        statement.setString(1, value);
+        bindIndexParam(statement, 1, dataContainer, index, value);
+
         statement.executeUpdate();
         return true;
       } catch (SQLException exception) {
@@ -181,14 +183,14 @@ public class SqliteData extends DataStore {
 
   @Override
   public void createDataStore(DataContainer dataContainer) {
-    String createCommand = dataContainer.getCreateCommand();
+    String createCommand = dataContainer.getCreateCommand(getProvider());
 
     try (Statement statement = writeConnection.createStatement()) {
       // Create the table first
       statement.executeUpdate(createCommand);
 
       // Follow with our index creation commands
-      for (String indexCommand : dataContainer.getIndexCommands()) {
+      for (String indexCommand : dataContainer.getIndexCommands(getProvider())) {
         statement.executeUpdate(indexCommand);
       }
     } catch (SQLException exception) {

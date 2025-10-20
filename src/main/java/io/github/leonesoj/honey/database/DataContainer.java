@@ -1,7 +1,11 @@
 package io.github.leonesoj.honey.database;
 
+import io.github.leonesoj.honey.database.providers.DataProvider;
 import io.github.leonesoj.honey.database.record.FieldType;
+import io.github.leonesoj.honey.database.record.impl.DialectTypeMapper;
+import io.github.leonesoj.honey.database.record.impl.DialectTypeMappers;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,16 +14,19 @@ import org.jetbrains.annotations.NotNull;
 public record DataContainer(@NotNull String containerName, @NotNull String primaryIndex,
                             @NotNull Map<String, FieldType> schema, @NotNull Set<String> indexes) {
 
-  public String getCreateCommand() {
+  public String getCreateCommand(DataProvider dialect) {
     StringBuilder command = new StringBuilder();
 
     command.append("CREATE TABLE IF NOT EXISTS ").append(containerName).append(" (");
+
+    DialectTypeMapper mapper = DialectTypeMappers.of(dialect);
     schema.forEach((field, type) ->
         command.append(field)
             .append(" ")
-            .append(type.getJdbcType())
+            .append(mapper.toSqlType(type))
             .append(", ")
     );
+
     command.append("PRIMARY KEY (").append(primaryIndex).append(")");
     command.append(")");
 
@@ -49,17 +56,22 @@ public record DataContainer(@NotNull String containerName, @NotNull String prima
     return command.toString();
   }
 
-  public List<String> getIndexCommands() {
+  public List<String> getIndexCommands(DataProvider dialect) {
     List<String> commands = new ArrayList<>();
+    Set<String> idxs = indexes.isEmpty() ? Set.of(primaryIndex) : new HashSet<>(indexes);
 
-    for (String index : indexes) {
-      String command =
-          "CREATE INDEX IF NOT EXISTS idx_%s ON %s (%s)".formatted(index, containerName, index);
-      commands.add(command);
+    for (String col : idxs) {
+      String idx = "idx_" + col;
+      if (dialect == DataProvider.SQLITE) {
+        commands.add(
+            "CREATE INDEX IF NOT EXISTS " + idx + " ON " + containerName + " (" + col + ")");
+      } else {
+        commands.add("CREATE INDEX " + idx + " ON " + containerName + " (" + col + ")");
+      }
     }
-
     return commands;
   }
+
 
   public String getUpdateCommand(Map<String, Object> fields, String index) {
     StringBuilder command = new StringBuilder();

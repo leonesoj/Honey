@@ -14,10 +14,6 @@ public class HoneyLoader implements PluginLoader {
 
     MavenLibraryResolver resolver = new MavenLibraryResolver();
     resolver.addDependency(new Dependency(
-        new DefaultArtifact("org.mongodb:mongodb-driver-sync:5.4.0"),
-        null
-    ));
-    resolver.addDependency(new Dependency(
         new DefaultArtifact("com.zaxxer:HikariCP:6.3.0"),
         null
     ));

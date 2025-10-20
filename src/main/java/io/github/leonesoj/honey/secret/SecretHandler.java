@@ -37,9 +37,9 @@ public class SecretHandler {
     return mac.doFinal(input.getBytes(StandardCharsets.UTF_8));
   }
 
-  public String hash(String input) {
+  public byte[] hash(String input) {
     try {
-      return Base64.getEncoder().encodeToString(hmacBytes(input));
+      return hmacBytes(input);
     } catch (Exception exception) {
       plugin.getLogger().log(Level.SEVERE, "Failed to run hash function", exception);
       throw new IllegalStateException("Failed to run hash function", exception);
