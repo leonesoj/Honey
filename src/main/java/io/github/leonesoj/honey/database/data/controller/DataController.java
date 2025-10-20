@@ -165,7 +165,7 @@ public abstract class DataController<T extends DataModel> implements Listener {
   protected CompletableFuture<Boolean> delete(UUID uuid) {
     String key = buildKey(uuid);
 
-    return data.delete(container, container.primaryIndex(), uuid.toString())
+    return data.delete(container, container.primaryIndex(), uuid)
         .thenCompose(ok -> {
           if (!ok) {
             return CompletableFuture.completedFuture(false);
