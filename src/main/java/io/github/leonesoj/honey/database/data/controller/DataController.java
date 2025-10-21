@@ -128,7 +128,7 @@ public abstract class DataController<T extends DataModel> implements Listener {
         })
         .whenComplete((ok, ex) -> {
           if (ex == null && Boolean.TRUE.equals(ok)) {
-            publishAsync(model, EventType.CREATE);
+            publishAsync(EventType.CREATE, model, uuid);
           }
         });
   }
@@ -153,7 +153,7 @@ public abstract class DataController<T extends DataModel> implements Listener {
         })
         .whenComplete((ok, ex) -> {
           if (ex == null && Boolean.TRUE.equals(ok)) {
-            publishAsync(model, EventType.UPDATE);
+            publishAsync(EventType.UPDATE, model, uuid);
           }
         });
   }
@@ -182,7 +182,7 @@ public abstract class DataController<T extends DataModel> implements Listener {
         })
         .whenComplete((ok, ex) -> {
           if (ex == null && Boolean.TRUE.equals(ok)) {
-            publishAsync(null, EventType.DELETE);
+            publishAsync(EventType.DELETE, null, uuid);
           }
         });
   }
@@ -214,9 +214,14 @@ public abstract class DataController<T extends DataModel> implements Listener {
     return future;
   }
 
-  private void publishAsync(T model, EventType type) {
-    Bukkit.getGlobalRegionScheduler()
-        .run(plugin, task -> observerService.publishEvent(model, type));
+  private void publishAsync(EventType type, T model, UUID uuid) {
+    Bukkit.getGlobalRegionScheduler().run(plugin, task -> {
+      switch (type) {
+        case CREATE -> observerService.publishCreate(model);
+        case UPDATE -> observerService.publishUpdate(model);
+        case DELETE -> observerService.publishDelete(uuid);
+      }
+    });
   }
 
   public ObserverService<T> getObserverService() {

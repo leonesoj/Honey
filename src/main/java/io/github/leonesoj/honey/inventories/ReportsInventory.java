@@ -85,15 +85,16 @@ public class ReportsInventory extends ReactiveInventory<Report> {
 
   @Override
   public void onUpdate(Report report) {
-    getInventory().getViewers().forEach(humanEntity -> {
-      humanEntity.sendPlainMessage("Received update event for report: " + report.getId());
-    });
+    reOpenForViewers();
   }
 
   @Override
   public void onCreate(Report report) {
-    getInventory().getViewers().forEach(humanEntity -> {
-      humanEntity.sendPlainMessage("Received create event for report: " + report.getId());
-    });
+    reOpenForViewers();
+  }
+
+  @Override
+  public void onDelete(UUID uuid) {
+    reOpenForViewers();
   }
 }

@@ -7,6 +7,7 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.database.data.model.Report;
 import io.github.leonesoj.honey.database.data.model.Report.ReportStatus;
+import io.github.leonesoj.honey.locale.Message;
 import io.github.leonesoj.honey.utils.inventory.ReactiveInventory;
 import io.github.leonesoj.honey.utils.inventory.SerializedItem;
 import io.github.leonesoj.honey.utils.inventory.SimpleInventory;
@@ -14,12 +15,16 @@ import io.github.leonesoj.honey.utils.other.SchedulerUtil;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -41,6 +46,8 @@ public class ReportViewInventory extends ReactiveInventory<Report> {
 
   @Override
   protected void buildContent() {
+    getInventory().clear();
+
     SerializedItem issuer = parseItem("issuer");
     addItem(issuer);
 
@@ -137,5 +144,29 @@ public class ReportViewInventory extends ReactiveInventory<Report> {
         : Bukkit.createProfile(player.getUniqueId(), player.getName());
   }
 
+  @Override
+  public boolean matches(Report other) {
+    return report.getId().equals(other.getId());
+  }
+
+  @Override
+  public boolean matchesId(UUID uuid) {
+    return report.getId().equals(uuid);
+  }
+
+  @Override
+  public void onUpdate(Report other) {
+    report.setStatus(other.getStatus());
+    reOpenForViewers();
+  }
+
+  @Override
+  public void onDelete(UUID other) {
+    List<HumanEntity> snapshot = new ArrayList<>(getInventory().getViewers());
+    for (HumanEntity viewer : snapshot) {
+      viewer.sendMessage(Message.prefixed("honey.report.deleted.react"));
+      viewer.closeInventory();
+    }
+  }
 }
 
