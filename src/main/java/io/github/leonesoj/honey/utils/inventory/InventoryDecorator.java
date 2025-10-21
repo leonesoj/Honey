@@ -42,37 +42,51 @@ public class InventoryDecorator {
     }
   }
 
-  public static void addBorder(Inventory inventory, ItemStack borderItem) {
-    int inventorySize = inventory.getSize();
-    int rows = inventorySize / 9;
+  public enum BorderPattern {
+    SOLID, CHECKERED
+  }
 
+  public static void addBorder(Inventory inventory, ItemStack borderItem) {
+    addBorder(inventory, borderItem, null, BorderPattern.SOLID, false);
+  }
+
+  public static void addBorder(Inventory inventory,
+      ItemStack primary,
+      ItemStack secondary,
+      BorderPattern pattern,
+      boolean force) {
+    int size = inventory.getSize();
+    if (size % 9 != 0) {
+      throw new IllegalStateException("Inventory size must be a multiple of 9");
+    }
+
+    int rows = size / 9;
     if (rows < 3) {
       throw new IllegalStateException("Inventory contains less than 3 rows");
     }
 
-    // Top Bar
-    for (int i = 0; i < 9; i++) {
-      if (inventory.getItem(i) == null) {
-        inventory.setItem(i, borderItem);
+    for (int i = 0; i < size; i++) {
+      if (!isBorderSlot(i, rows)) {
+        continue;
       }
-    }
+      if (inventory.getItem(i) != null && !force) {
+        continue;
+      }
 
-    // Bottom Bar
-    for (int i = (inventorySize - 9); i < inventorySize; i++) {
-      if (inventory.getItem(i) == null) {
-        inventory.setItem(i, borderItem);
+      if (pattern == BorderPattern.SOLID || secondary == null) {
+        inventory.setItem(i, primary);
+      } else {
+        int row = i / 9;
+        int col = i % 9;
+        inventory.setItem(i, ((row + col) % 2 == 0) ? primary : secondary);
       }
     }
+  }
 
-    // Side Bars
-    for (int i = 0; i <= (inventorySize - 1); i += 9) {
-      if (inventory.getItem(i) == null) {
-        inventory.setItem(i, borderItem); // Left Side Bar
-      }
-      if (inventory.getItem(i + 8) == null) {
-        inventory.setItem((i + 8), borderItem); // Right Side bar
-      }
-    }
+  private static boolean isBorderSlot(int index, int rows) {
+    int row = index / 9;
+    int col = index % 9;
+    return row == 0 || row == rows - 1 || col == 0 || col == 8;
   }
 
   public static void createLoadingScreen(Inventory inventory) {

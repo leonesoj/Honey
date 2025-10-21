@@ -1,5 +1,6 @@
 package io.github.leonesoj.honey.utils.inventory;
 
+import io.github.leonesoj.honey.utils.inventory.InventoryDecorator.BorderPattern;
 import io.github.leonesoj.honey.utils.item.ItemBuilder;
 import io.github.leonesoj.honey.utils.other.LocaleUtil;
 import java.util.Collections;
@@ -58,6 +59,18 @@ public abstract class SerializedInventory extends SimpleInventory {
           new ItemBuilder(
               decoratorSection.getConfigurationSection("border_item"),
               locale).build()
+      );
+      case "checkered_border" -> InventoryDecorator.addBorder(getInventory(),
+          new ItemBuilder(
+              decoratorSection.getConfigurationSection("border_item_one"),
+              locale
+          ).build(),
+          new ItemBuilder(
+              decoratorSection.getConfigurationSection("border_item_two"),
+              locale
+          ).build(),
+         BorderPattern.CHECKERED,
+         force
       );
       case "checkerboard" -> InventoryDecorator.addCheckerboard(getInventory(),
           new ItemBuilder(

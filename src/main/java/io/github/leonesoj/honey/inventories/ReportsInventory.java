@@ -6,6 +6,9 @@ import io.github.leonesoj.honey.utils.inventory.InventoryDecorator;
 import io.github.leonesoj.honey.utils.inventory.ReactiveInventory;
 import io.github.leonesoj.honey.utils.inventory.SerializedItem;
 import io.github.leonesoj.honey.utils.inventory.SimpleInventory;
+import io.github.leonesoj.honey.utils.other.DurationUtil;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.UUID;
@@ -51,6 +54,8 @@ public class ReportsInventory extends ReactiveInventory<Report> {
             OfflinePlayer subject = Bukkit.getOfflinePlayer(report.getSubject());
             OfflinePlayer issuer = Bukkit.getOfflinePlayer(report.getIssuer());
 
+            Duration timeSince = Duration.between(report.getTimestamp(), Instant.now());
+
             SerializedItem reportItem = parseItem("report_item");
             reportItem.item()
                 .addPlaceHolder("short-id", Component.text(id.toString().substring(0, 8)))
@@ -59,7 +64,8 @@ public class ReportsInventory extends ReactiveInventory<Report> {
                 .addPlaceHolder("issuer", Component.text(issuer.getName()))
                 .addPlaceHolder("reason", Component.text(report.getReason()))
                 .addPlaceHolder("status", Component.text(report.getStatus().name()))
-                .addPlaceHolder("server", Component.text(report.getServer()));
+                .addPlaceHolder("server", Component.text(report.getServer()))
+                .addPlaceHolder("time_since", Component.text(DurationUtil.format(timeSince)));
             packItem(reportItem, event -> {
               SimpleInventory reportView = new ReportViewInventory(report, getLocale(), this);
               registerChild(reportView);

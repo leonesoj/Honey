@@ -47,6 +47,7 @@ public class ReportViewInventory extends ReactiveInventory<Report> {
   @Override
   protected void buildContent() {
     getInventory().clear();
+    applyDecorator(false);
 
     SerializedItem issuer = parseItem("issuer");
     addItem(issuer);
@@ -100,7 +101,6 @@ public class ReportViewInventory extends ReactiveInventory<Report> {
           .addPlaceHolder("status", fancyStatus(issuerPlayer.isOnline()));
       addItem(issuer);
     });
-
   }
 
   private Consumer<InventoryClickEvent> changeReportStatus(ReportStatus status) {
