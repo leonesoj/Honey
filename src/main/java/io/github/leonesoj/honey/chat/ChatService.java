@@ -8,10 +8,13 @@ import io.github.leonesoj.honey.chat.filtering.ChatFilter;
 import io.github.leonesoj.honey.chat.filtering.ChatFilter.Result;
 import io.github.leonesoj.honey.chat.filtering.ForbiddenWords;
 import io.github.leonesoj.honey.chat.messaging.PrivateChatService;
+import io.github.leonesoj.honey.database.data.model.PlayerSettings;
 import io.github.leonesoj.honey.utils.other.DurationUtil;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import java.time.Duration;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -20,6 +23,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -46,8 +50,9 @@ public class ChatService implements Listener {
 
   public ChatService() {
     this.spyService = new SpyService();
-    this.privateChatService = new PrivateChatService(spyService);
     this.filter = new ChatFilter(ForbiddenWords.load(Honey.getInstance()));
+    this.privateChatService = new PrivateChatService(spyService, filter);
+
     Bukkit.getPluginManager().registerEvents(this, Honey.getInstance());
   }
 
@@ -192,15 +197,6 @@ public class ChatService implements Listener {
     return spyService;
   }
 
-  @EventHandler
-  public void onJoin(PlayerJoinEvent event) {
-    channels.values().forEach(chatChannel -> {
-      if (chatChannel.shouldDefaultJoin() && chatChannel.canJoin(event.getPlayer())) {
-        joinChannel(chatChannel.getIdentifier(), event.getPlayer());
-      }
-    });
-  }
-
   @EventHandler(priority = EventPriority.LOWEST)
   public void onChat(AsyncChatEvent event) {
     Player player = event.getPlayer();
@@ -233,6 +229,17 @@ public class ChatService implements Listener {
       } else {
         chatChannel.slowParticipant(player.getUniqueId());
       }
+    }
+
+    Optional<PlayerSettings> senderSettingsOpt = Honey.getInstance()
+        .getDataHandler()
+        .getSettingsController()
+        .getSettings(player.getUniqueId());
+
+    if (senderSettingsOpt.isPresent() && !senderSettingsOpt.get().hasChatMessages()) {
+      player.sendMessage(Component.translatable("honey.channel.disallowed.settings"));
+      event.setCancelled(true);
+      return;
     }
 
     String raw = event.signedMessage().message();
@@ -289,10 +296,58 @@ public class ChatService implements Listener {
     event.viewers().removeIf(audience ->
         !chatChannel.hasMember(audience) && !isSpy(audience)
     );
+
+    for (Iterator<Audience> it = event.viewers().iterator(); it.hasNext(); ) {
+      Audience audience = it.next();
+
+      Optional<UUID> optional = audience.get(Identity.UUID);
+      if (optional.isEmpty()) {
+        continue;
+      }
+
+      UUID uuid = optional.get();
+
+      Optional<PlayerSettings> settingsOpt = Honey.getInstance()
+          .getDataHandler()
+          .getSettingsController()
+          .getSettings(uuid);
+
+      if (settingsOpt.isEmpty()) {
+        continue;
+      }
+
+      PlayerSettings settings = settingsOpt.get();
+
+      if (!settings.hasChatMessages()) {
+        it.remove();
+        continue;
+      }
+
+      if (settings.hasSoundAlerts()) {
+        Player viewer = Bukkit.getPlayer(uuid);
+        if (viewer != null) {
+          String name = viewer.getName().toLowerCase(Locale.ROOT);
+          String plainMessage = event.signedMessage().message().toLowerCase(Locale.ROOT);
+          if (plainMessage.contains(name)) {
+            viewer.playSound(viewer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
+          }
+        }
+      }
+    }
+
     event.renderer((source, sourceDisplayName, message, viewer) ->
         HoneyChatRenderer.getInstance()
             .render(source, sourceDisplayName, message, viewer, event.signedMessage(), result, this)
     );
+  }
+
+  @EventHandler
+  public void onJoin(PlayerJoinEvent event) {
+    channels.values().forEach(chatChannel -> {
+      if (chatChannel.shouldDefaultJoin() && chatChannel.canJoin(event.getPlayer())) {
+        joinChannel(chatChannel.getIdentifier(), event.getPlayer());
+      }
+    });
   }
 
   @EventHandler
