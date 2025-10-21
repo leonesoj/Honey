@@ -4,9 +4,11 @@ main:
     es-MX: "Reportes"
   size: 54
   decorator:
-    type: border
-    border_item:
+    type: checkered_border
+    border_item_one:
       type: red_stained_glass_pane
+    border_item_two:
+      type: gray_stained_glass_pane
   items:
     report_item:
       type: book
@@ -16,14 +18,15 @@ main:
       lore:
         en-US:
           - ""
-          - "<gray>Subject: </gray> <red>{subject}</red>"
-          - "<gray>Issuer:</gray> <green>{issuer}</green>"
-          - "<gray>Reason:</gray> <yellow>{reason}</yellow>"
+          - "<gray>Subject:</gray> <gold>{subject}</gold>"
+          - "<gray>Issuer:</gray> <gold>{issuer}</gold>"
+          - "<gray>Reason:</gray> <gold>{reason}</gold>"
           - ""
-          - "<gray>Server:</gray> <yellow>{server}</yellow>"
-          - "<gray>Status:</gray> <yellow>{status}</yellow>"
+          - "<gray>Server:</gray> <gold>{server}</gold>"
+          - "<gray>Status:</gray> <gold>{status}</gold>"
+          - "<gray>Time Since:<gray> <gold>{time_since}</gold>"
           - ""
-          - "<gold><i>Click to view more details</i></gold>"
+          - "<yellow><i>Click to view more details</i></yellow>"
     exit_item:
       type: barrier
       slot: 49
@@ -31,64 +34,67 @@ main:
         en-US: "<red>Exit</red>"
         es-MX: "<red>Salir</red>"
 
-report_viewer:
+report_view:
   title:
-    en-US: ""
+    en-US: "Report View"
     es-MX: ""
   size: 45
   decorator:
-    type: "checkerboard"
-    checkerboard_item_one:
-      type: red_stained_glass_pane
-    checkerboard_item_two:
+    type: "fill"
+    fill_item:
       type: gray_stained_glass_pane
   items:
-    issuer_head:
+    issuer:
       type: player_head
       slot: 11
       display_name:
-        en-US: "<gray>Issuer:</gray> <green>{issuer-name}</green>"
+        en-US: "<gray>Issuer: <green>{name}</green> ({status})</gray>"
         es-MX: ""
-    report_info:
-      type: enchanted_book
-      slot: 13
-      display_name:
-        en-US: "<gray>Report:</gray> <yellow>{report-id}</yellow>"
-        es-MX: ""
-    subject_head:
+    subject:
       type: player_head
       slot: 15
       display_name:
-        en-US: "<gray>Subject:</gray> <red>{subject-name}</red>"
+        en-US: "<gray>Subject: <red>{name}</red> ({status})</gray>"
+        es-MX: ""
+    report_item:
+      type: enchanted_book
+      slot: 13
+      display_name:
+        en-US: "<red>Report:</red> <gray>{short-id}</gray>"
         es-MX: ""
       lore:
         en-US:
-          - "<gray>Status:</gray> <green>ONLINE</green>"
-          - "<gray>Playtime:</gray> <green>20.25 Hours</green>"
-          - "<gray>Last Seen(Server):</gray> <green>hive1</green>"
-          - "<gray>Reported:</gray> <green>5 times</green>"
           - ""
-          - "<gold>Click to teleport</gold>"
-          - "<light_purple><bold>Shift+Click</bold> to teleport</light_purple>"
-          - "<light_purple>in staff mode</light_purple>"
+          - "<gray>Status:</gray> <gold>{status}</gold>"
+          - "<gray>Reason:</gray> <gold>{reason}</gold>"
+          - ""
+          - "<gray>Date:</gray> <gold>{date}</gold>"
+          - "<gray>Server:</gray> <gold>{server}</gold>"
+          - ""
+      glint: true
     mark_as_noted:
-      type: yellow_terracotta
+      type: yellow_concrete
       slot: 30
       display_name:
-        en-US: "<gray>Mark as <bold>Noted</bold></gray>"
+        en-US: "<gray>Mark as <yellow><bold>Noted</bold></yellow></gray>"
         es-MX: ""
-    pending_review:
-      type: white_terracotta
-      slot: 31
-      display_name:
-        en-US: "<gray>Pending Review</gray>"
     mark_as_resolved:
-      type: lime_terracotta
+      type: lime_concrete
       slot: 32
       display_name:
-        en-US: "<gray>Mark as <bold>Resolved</bold></gray>"
+        en-US: "<gray>Mark as <green><bold>Resolved</bold></green></gray>"
+    delete_item:
+      type: cauldron
+      slot: 31
+      display_name:
+        en-US: "<dark_red>Delete Report</dark_red>"
+    back_item:
+      type: arrow
+      slot: 28
+      display_name:
+        en-US: "<gray>Go Back</gray>"
     exit_item:
       type: barrier
-      slot: 35
+      slot: 34
       display_name:
         en-US: "<red><i>Exit</i></red>"
