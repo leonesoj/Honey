@@ -1,11 +1,12 @@
 package io.github.leonesoj.honey.observer;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ObserverService<T> {
 
-  private final List<Observer<T>> observers = new ArrayList<>();
+  private final List<Observer<T>> observers = new CopyOnWriteArrayList<>();
 
   public void registerObserver(Observer<T> observer) {
     observers.add(observer);
@@ -15,18 +16,26 @@ public class ObserverService<T> {
     observers.remove(observer);
   }
 
-  public void publishEvent(T t, EventType eventType) {
+  public void publishCreate(T t) {
     for (Observer<T> observer : observers) {
-      if (eventType == EventType.CREATE) {
+      if (observer.matches(t)) {
         observer.onCreate(t);
-      } else if (observer.matches(t)) {
-        switch (eventType) {
-          case UPDATE -> observer.onUpdate(t);
-          case DELETE -> observer.onDelete(t);
-          default -> {
-            return;
-          }
-        }
+      }
+    }
+  }
+
+  public void publishUpdate(T t) {
+    for (Observer<T> observer : observers) {
+      if (observer.matches(t)) {
+        observer.onUpdate(t);
+      }
+    }
+  }
+
+  public void publishDelete(UUID id) {
+    for (Observer<T> observer : observers) {
+      if (observer.matchesId(id)) {
+        observer.onDelete(id);
       }
     }
   }

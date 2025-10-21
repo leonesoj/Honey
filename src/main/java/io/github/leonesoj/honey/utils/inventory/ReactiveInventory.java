@@ -5,6 +5,8 @@ import io.github.leonesoj.honey.observer.ObserverService;
 import java.util.Locale;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public abstract class ReactiveInventory<T> extends SerializedInventory
@@ -35,5 +37,13 @@ public abstract class ReactiveInventory<T> extends SerializedInventory
 
   protected ObserverService<T> getObserverService() {
     return observerService;
+  }
+
+  protected void reOpenForViewers() {
+    for (HumanEntity viewer : getInventory().getViewers()) {
+      if (viewer instanceof Player player) {
+        open(player);
+      }
+    }
   }
 }
