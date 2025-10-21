@@ -44,8 +44,7 @@ public class ReplyCommand {
       return Command.SINGLE_SUCCESS;
     }
 
-    chatService.sendPrivateMessage(sender, target, Component.text(message));
-
+    chatService.sendPrivateMessage(sender, target, message);
     return Command.SINGLE_SUCCESS;
   }
 

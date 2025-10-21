@@ -2,6 +2,8 @@ package io.github.leonesoj.honey.chat.messaging;
 
 import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.chat.SpyService;
+import io.github.leonesoj.honey.chat.filtering.ChatFilter;
+import io.github.leonesoj.honey.chat.filtering.ChatFilter.Result;
 import io.github.leonesoj.honey.database.data.controller.SettingsController;
 import io.github.leonesoj.honey.database.data.model.PlayerSettings;
 import java.util.HashMap;
@@ -28,13 +30,15 @@ public class PrivateChatService implements Listener {
   private final Map<UUID, UUID> lastContacts = new HashMap<>();
 
   private final SpyService spyService;
+  private final ChatFilter filter;
 
   private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
   private static final String PRIVATE_MESSAGE_FORMAT_PATH = "private_messaging.format.";
 
-  public PrivateChatService(SpyService spyService) {
+  public PrivateChatService(SpyService spyService, ChatFilter filter) {
     this.spyService = spyService;
+    this.filter = filter;
   }
 
   private void startSession(UUID participantA, UUID participantB) {
@@ -48,9 +52,29 @@ public class PrivateChatService implements Listener {
         .recordMessage(sender);
   }
 
-  public void sendPrivateMessage(Player sender, Player recipient, Component message) {
+  public void sendPrivateMessage(Player sender, Player recipient, String plainMessage) {
     UUID senderUuid = sender.getUniqueId();
     UUID recipientUuid = recipient.getUniqueId();
+
+    Result result = filter.apply(plainMessage);
+    switch (result.action()) {
+      case BLOCK_BAD_CHAR -> {
+        sender.sendMessage(Component.translatable("honey.channel.disallowed.badchar"));
+        return;
+      }
+      case BLOCK_URL -> {
+        sender.sendMessage(Component.translatable("honey.channel.disallowed.url"));
+        return;
+      }
+      case BLOCK_IP -> {
+        sender.sendMessage(Component.translatable("honey.channel.disallowed.ip"));
+        return;
+      }
+      case BLOCK_WORD -> {
+        sender.sendMessage(Component.translatable("honey.channel.disallowed.forbidden"));
+        return;
+      }
+    }
 
     SettingsController settingsController = Honey.getInstance().getDataHandler()
         .getSettingsController();
@@ -96,17 +120,22 @@ public class PrivateChatService implements Listener {
 
     respond(senderUuid, recipientUuid); // For metadata tracking
 
+    Component message = Component.text(plainMessage);
+    Component censoredMessage = result.censoredText();
+
     ConfigurationSection chatSection = Honey.getInstance().getConfig()
         .getConfigurationSection("chat");
     Component toUser = MINI_MESSAGE.deserialize(
         chatSection.getString(PRIVATE_MESSAGE_FORMAT_PATH + "to_user"),
         Placeholder.component("recipient", recipient.displayName()),
-        Placeholder.component("message", message)
+        Placeholder.component("message",
+            senderSettings.hasProfanityFilter() ? censoredMessage : message)
     );
     Component fromUser = MINI_MESSAGE.deserialize(
         chatSection.getString(PRIVATE_MESSAGE_FORMAT_PATH + "from_user"),
         Placeholder.component("sender", sender.displayName()),
-        Placeholder.component("message", message)
+        Placeholder.component("message",
+            targetSettings.hasProfanityFilter() ? censoredMessage : message)
     );
 
     sender.sendMessage(toUser);

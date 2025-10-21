@@ -19,7 +19,8 @@ main:
       lore:
         en-US:
           - "<gray>Toggle whether or not you want</gray>"
-          - "<gray>to see <i>public</i> chat message</gray>"
+          - "<gray>to see <i>public</i> chat messages</gray>"
+          - "<gray>in your current chat channel</gray>"
           - ""
           - "<gray>Currently:</gray> %status%"
           - ""
@@ -34,7 +35,7 @@ main:
       lore:
         en-US:
           - "<gray>Toggle whether or not you want</gray>"
-          - "<gray>to see <i>private</i> chat message</gray>"
+          - "<gray>to allow <i>private</i> chat messaging</gray>"
           - ""
           - "<gray>Currently:</gray> %status%"
           - ""
@@ -65,8 +66,9 @@ main:
       lore:
         en-US:
           - "<gray>Toggle whether or not you want</gray>"
-          - "<gray>to be pinged when your name is</gray>"
-          - "<gray>mentioned in general chat</gray>"
+          - "<gray>to be pinged whenever you're</gray>"
+          - "<gray>messaged privately or your name is</gray>"
+          - "<gray>mentioned in your current chat channel</gray>"
           - ""
           - "<gray>Currently:</gray> %status%"
           - ""

@@ -8,7 +8,6 @@ import io.github.leonesoj.honey.Honey;
 import io.github.leonesoj.honey.utils.command.OtherPlayerArgument;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 public class MessageCommand {
@@ -30,7 +29,7 @@ public class MessageCommand {
     String message = ctx.getArgument("message", String.class);
 
     Honey.getInstance().getChatService().getPrivateChatService()
-        .sendPrivateMessage(sender, recipient, Component.text(message));
+        .sendPrivateMessage(sender, recipient, message);
 
     return Command.SINGLE_SUCCESS;
   }
