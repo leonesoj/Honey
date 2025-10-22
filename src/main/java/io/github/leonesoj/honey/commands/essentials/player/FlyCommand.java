@@ -41,7 +41,7 @@ public class FlyCommand {
     Player sender = (Player) ctx.getSource().getSender();
     boolean newStatus = invertFlightMode(target);
 
-    sender.sendMessage(prefixed("honey.fly.target." + fancyStatus(newStatus),
+    sender.sendMessage(prefixed("honey.fly.other." + fancyStatus(newStatus),
         argComponent("player", target.getName()))
     );
 

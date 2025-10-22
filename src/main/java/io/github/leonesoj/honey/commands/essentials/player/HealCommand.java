@@ -26,9 +26,7 @@ public class HealCommand {
 
   private static int commandUsage(CommandContext<CommandSourceStack> ctx) {
     Player sender = (Player) ctx.getSource().getSender();
-
     healPlayer(sender);
-    sender.sendMessage(Message.prefixed("honey.heal.self"));
 
     return Command.SINGLE_SUCCESS;
   }
@@ -41,8 +39,8 @@ public class HealCommand {
     Player sender = (Player) ctx.getSource().getSender();
 
     healPlayer(target);
-    sender.sendMessage(Message.prefixed("honey.heal.target",
-        Message.argComponent("player", target.name()))
+    sender.sendMessage(Message.prefixed("honey.heal.other",
+        Message.argComponent("player", target.getName()))
     );
 
     return Command.SINGLE_SUCCESS;

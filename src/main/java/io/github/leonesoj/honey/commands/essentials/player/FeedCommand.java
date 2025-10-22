@@ -1,16 +1,14 @@
 package io.github.leonesoj.honey.commands.essentials.player;
 
-import static io.github.leonesoj.honey.locale.Message.argComponent;
-
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.github.leonesoj.honey.locale.Message;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 public class FeedCommand {
@@ -28,8 +26,6 @@ public class FeedCommand {
   public static int commandUsage(CommandContext<CommandSourceStack> ctx) {
     Player sender = (Player) ctx.getSource().getSender();
     feedPlayer(sender);
-
-    sender.sendMessage(Component.translatable("honey.feed"));
     return Command.SINGLE_SUCCESS;
   }
 
@@ -41,8 +37,8 @@ public class FeedCommand {
     Player sender = (Player) ctx.getSource().getSender();
 
     feedPlayer(target);
-    sender.sendMessage(Component.translatable("honey.feed.other",
-        argComponent("player", target.getName())
+    sender.sendMessage(Message.prefixed("honey.feed.other",
+        Message.argComponent("player", target.getName())
     ));
     return Command.SINGLE_SUCCESS;
   }

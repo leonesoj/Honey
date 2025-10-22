@@ -55,7 +55,6 @@ public class SkullCommand {
       meta.setOwningPlayer(player);
       meta.setPlayerProfile(profile);
     });
-
     return itemStack;
   }
 

@@ -32,6 +32,9 @@ public class HoneyCommand {
           honey.getChatService().getChannel("general").setFormat(
               honey.config().getString("chat.channels.general.format")
           );
+          honey.getChatService().getChannel("staff").setFormat(
+              honey.config().getString("chat.channels.staff.format")
+          );
           sendMessageAsync(playerUuid, prefixed("honey.reload"));
         })
         .exceptionally(throwable -> {

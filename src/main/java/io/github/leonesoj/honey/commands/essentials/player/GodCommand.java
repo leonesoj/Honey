@@ -41,7 +41,7 @@ public class GodCommand {
     Player sender = (Player) ctx.getSource().getSender();
 
     boolean status = invertGodMode(target);
-    sender.sendMessage(Message.prefixed("honey.god.target." + Message.fancyStatus(status),
+    sender.sendMessage(Message.prefixed("honey.god.other." + Message.fancyStatus(status),
         Message.argComponent("player", target.getName()))
     );
 
