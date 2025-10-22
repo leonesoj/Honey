@@ -3,6 +3,8 @@ package io.github.leonesoj.honey.commands.moderation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.github.leonesoj.honey.Honey;
+import io.github.leonesoj.honey.locale.Message;
 import io.github.leonesoj.honey.utils.command.OtherPlayerArgument;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -23,7 +25,12 @@ public class InvseeCommand {
     Player target = ctx.getArgument("player", Player.class);
     Player sender = (Player) ctx.getSource().getSender();
 
-    sender.openInventory(target.getInventory());
+    if (!Honey.getInstance().getStaffHandler().isInStaffMode(target.getUniqueId())) {
+      sender.openInventory(target.getInventory());
+    } else {
+      sender.sendMessage(Message.prefixed("honey.invsee.staff"));
+    }
+
     return Command.SINGLE_SUCCESS;
   }
 
