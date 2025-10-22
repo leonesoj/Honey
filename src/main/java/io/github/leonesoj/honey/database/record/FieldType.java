@@ -37,15 +37,15 @@ public enum FieldType {
   }),
   INSTANT((rs, c, d) -> {
     switch (d) {
-      case MYSQL: { // DATETIME(6) stored as UTC, no zone in DB
+      case MYSQL -> { // DATETIME(6) stored as UTC, no zone in DB
         LocalDateTime ldt = rs.getObject(c, LocalDateTime.class);
         return (ldt == null) ? null : ldt.atOffset(ZoneOffset.UTC).toInstant();
       }
-      case SQLITE: { // INTEGER epoch millis
+      case SQLITE -> { // INTEGER epoch millis
         long ms = rs.getLong(c);
         return rs.wasNull() ? null : Instant.ofEpochMilli(ms);
       }
-      default: {
+      default -> {
         return rs.getObject(c, Instant.class);
       }
     }

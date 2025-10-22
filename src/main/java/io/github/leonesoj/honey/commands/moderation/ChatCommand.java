@@ -36,7 +36,6 @@ public class ChatCommand {
                 .executes(ChatCommand::slowDurationUsage)))
         .then(Commands.literal("unslow").executes(ChatCommand::unSlowUsage))
         .then(Commands.literal("clear").executes(ChatCommand::clearHereUsage))
-        .then(Commands.literal("logs"))
         .then(Commands.literal("mod").executes(ChatCommand::modUsage))
         .then(Commands.literal("spy").executes(ChatCommand::spyUsage)
             .then(Commands.argument("player", new OtherPlayerArgument(true))

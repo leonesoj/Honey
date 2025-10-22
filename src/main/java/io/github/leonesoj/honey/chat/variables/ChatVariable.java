@@ -4,6 +4,8 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 public interface ChatVariable {
+
   String name();
+
   Component replacement(Player player);
 }

@@ -9,7 +9,6 @@ import io.github.leonesoj.honey.utils.inventory.SimpleInventory;
 import io.github.leonesoj.honey.utils.other.DurationUtil;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
@@ -20,9 +19,6 @@ import org.bukkit.entity.Player;
 public class ReportsInventory extends ReactiveInventory<Report> {
 
   private static final int REPORTS_PER_INVENTORY = 28;
-  private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern(
-      "MM/dd/yyyy h:mma"
-  );
 
   private int offset;
 
