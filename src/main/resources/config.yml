@@ -65,14 +65,13 @@ chat:
   # - Mute Talk Bypass : honey.chat.<channel_identifier_here>.bypass.mute
   channels:
     general:
-      format: "<prefix><light_purple><display_name>:</light_purple> <white><message></white>"
+      format: "<light_purple><display_name>:</light_purple> <white><message></white>"
     staff:
       format: "<gold><display_name>:</gold> <white><message></white>"
   private_messaging:
     format:
       to_user: "<gray>(<i>You</i> » <recipient>):</gray> <white><message></white>"
       from_user: "<gray>(<sender> » <i>You</i>):</gray> <white><message></white>"
-    max_chat_history: 150
   spy:
     format:
       command: <gray><<light_purple>#</light_purple>> <player>:</gray> <command>
