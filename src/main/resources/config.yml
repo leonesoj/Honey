@@ -65,9 +65,9 @@ chat:
   # - Mute Talk Bypass : honey.chat.<channel_identifier_here>.bypass.mute
   channels:
     general:
-      format: "<light_purple><display_name>:</light_purple> <white><message></white>"
+      format: "<gray><display_name>:</gray> <white><message></white>"
     staff:
-      format: "<gold><display_name>:</gold> <white><message></white>"
+      format: "<gray>[<dark_red><b>!</b></dark_red>]</gray> <gold><display_name>:</gold> <white><message></white>"
   private_messaging:
     format:
       to_user: "<gray>(<i>You</i> » <recipient>):</gray> <white><message></white>"

@@ -27,7 +27,6 @@ public class RepairCommand {
     ItemStack heldItem = sender.getInventory().getItemInMainHand();
     heldItem.editMeta(Damageable.class, Damageable::resetDamage);
 
-    sender.sendMessage(Component.translatable("honey.repair"));
     return Command.SINGLE_SUCCESS;
   }
 
@@ -41,8 +40,6 @@ public class RepairCommand {
         inv.setItem(i, item);
       }
     }
-
-    sender.sendMessage(Component.translatable("honey.repair.all"));
     return Command.SINGLE_SUCCESS;
   }
 

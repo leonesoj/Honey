@@ -69,11 +69,9 @@ public class HoneyChatRenderer {
 
       if (chatService.isChatMod(viewerUuid)) {
         Component deleteButton = Component.textOfChildren(
-            Component.text("[", NamedTextColor.DARK_GRAY),
-            Component.text("✖", NamedTextColor.RED).clickEvent(
+            Component.text("✖", NamedTextColor.DARK_RED).clickEvent(
                 ClickEvent.callback(audience -> Bukkit.getServer().deleteMessage(signedMessage))
             ),
-            Component.text("]", NamedTextColor.DARK_GRAY),
             Component.space()
         );
         base = base.append(deleteButton);
