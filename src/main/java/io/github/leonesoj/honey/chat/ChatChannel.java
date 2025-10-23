@@ -15,7 +15,6 @@ import org.bukkit.Bukkit;
 
 public class ChatChannel {
 
-  /** Duration in milliseconds. */
   private static final long DEFAULT_SLOW_DURATION = 5000L;
 
   private final String identifier;
@@ -26,7 +25,8 @@ public class ChatChannel {
 
   private final Map<UUID, Long> slowedParticipants = new ConcurrentHashMap<>();
 
-  private long slowDuration = DEFAULT_SLOW_DURATION;
+  /** Duration in milliseconds. */
+  private long slowDuration;
 
   private final Predicate<Audience> joinCriteria;
   private final Predicate<Audience> talkCriteria;
@@ -48,6 +48,7 @@ public class ChatChannel {
     this.muteTalkCriteria = builder.muteTalkCriteria;
 
     this.shouldDefaultJoin = builder.shouldDefaultJoin;
+    this.slowDuration = builder.slowDuration;
     this.listeners.add(Bukkit.getConsoleSender());
   }
 
@@ -198,6 +199,8 @@ public class ChatChannel {
     private final String identifier;
     private final String format;
 
+    private long slowDuration = DEFAULT_SLOW_DURATION;
+
     private Predicate<Audience> joinCriteria = audience -> true;
     private Predicate<Audience> talkCriteria = audience -> true;
     private Predicate<Audience> slowTalkCriteria = audience -> true;
@@ -232,6 +235,11 @@ public class ChatChannel {
 
     public ChatChannelBuilder setShouldDefaultJoin(boolean shouldDefaultJoin) {
       this.shouldDefaultJoin = shouldDefaultJoin;
+      return this;
+    }
+
+    public ChatChannelBuilder setSlowDuration(long slowDuration) {
+      this.slowDuration = slowDuration;
       return this;
     }
 

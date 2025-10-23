@@ -1,6 +1,6 @@
 package io.github.leonesoj.honey.chat;
 
-import java.time.Duration;
+import io.github.leonesoj.honey.Honey;
 import java.util.Deque;
 import java.util.Locale;
 import java.util.UUID;
@@ -9,16 +9,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public final class MessageGuard {
 
-  private final int historySize;
-  private final long cooldownMillis;
-
   private final ConcurrentHashMap<UUID, Deque<String>> history = new ConcurrentHashMap<>();
   private final ConcurrentHashMap<UUID, Long> lastSent = new ConcurrentHashMap<>();
-
-  public MessageGuard(Duration cooldown, int historySize) {
-    this.cooldownMillis = Math.max(0, cooldown.toMillis());
-    this.historySize = Math.max(1, historySize);
-  }
 
   public enum Violation {
     NONE, DUPLICATE, COOLDOWN
@@ -44,7 +36,8 @@ public final class MessageGuard {
   }
 
   public CheckResult check(UUID playerId, String messageRaw) {
-    final long now = System.currentTimeMillis();
+    long now = System.currentTimeMillis();
+    long cooldownMillis = getCooldownDuration() * 1000L;
 
     Long last = lastSent.get(playerId);
     if (last != null) {
@@ -68,6 +61,8 @@ public final class MessageGuard {
   public void recordSuccess(UUID playerId, String message) {
     lastSent.put(playerId, System.currentTimeMillis());
 
+    int historySize = Honey.getInstance().config().getInt("chat.history_size");
+
     Deque<String> q = history.computeIfAbsent(playerId, id -> new ConcurrentLinkedDeque<>());
     while (q.size() >= historySize) {
       q.pollFirst();
@@ -76,6 +71,10 @@ public final class MessageGuard {
     if (!message.isEmpty()) {
       q.offerLast(message);
     }
+  }
+
+  public int getCooldownDuration() {
+    return Honey.getInstance().config().getInt("chat.cooldown_duration");
   }
 
   public void clear(UUID playerId) {

@@ -33,9 +33,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class ChatService implements Listener {
 
-  private static final Duration CHAT_COOLDOWN = Duration.ofSeconds(3);
-  private static final int MAX_CHAT_DUPE = 3;
-
   private final ConcurrentHashMap<String, ChatChannel> channels = new ConcurrentHashMap<>();
 
   private final Set<UUID> chatMods = ConcurrentHashMap.newKeySet();
@@ -44,7 +41,7 @@ public class ChatService implements Listener {
   private final SpyService spyService;
 
   private final ChatFilter filter;
-  private final MessageGuard messageGuard = new MessageGuard(CHAT_COOLDOWN, MAX_CHAT_DUPE);
+  private final MessageGuard messageGuard = new MessageGuard();
 
   private ChatChannel defaultChannel;
 
@@ -248,11 +245,9 @@ public class ChatService implements Listener {
     switch (guard.violation()) {
       case COOLDOWN -> {
         if (!player.hasPermission("honey.chat.bypass.cooldown")) {
-          double secs = guard.remainingMillis() / 1000.0;
-          String pretty = String.format(java.util.Locale.US, "%.2f", secs);
           player.sendMessage(Component.translatable(
               "honey.channel.disallowed.cooldown",
-              argComponent("duration", pretty)
+              argComponent("duration", messageGuard.getCooldownDuration())
           ));
           event.setCancelled(true);
           return;
