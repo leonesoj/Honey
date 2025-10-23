@@ -134,6 +134,7 @@ public final class Honey extends JavaPlugin {
     ChatChannel generalChat = new ChatChannelBuilder("general",
         config().getString("chat.channels.general.format"))
         .setShouldDefaultJoin(true)
+        .setSlowDuration(config().getInt("chat.slow_duration") * 1000L)
         .setMuteTalkCriteria(audience -> {
           Optional<UUID> optional = audience.get(Identity.UUID);
           return optional.map(
