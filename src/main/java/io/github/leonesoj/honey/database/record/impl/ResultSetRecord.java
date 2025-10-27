@@ -5,21 +5,20 @@ import io.github.leonesoj.honey.database.record.DataRecord;
 import io.github.leonesoj.honey.database.record.FieldType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
 
-public class ResultSetRecord implements DataRecord {
+public record ResultSetRecord(ResultSet resultSet, DataProvider dialect,
+                              Map<String, FieldType> schema) implements DataRecord {
 
-  private final ResultSet resultSet;
-  private final DataProvider dialect;
+  @Override
+  public <T> T get(String key) {
+    FieldType fieldType = schema.get(key);
+    if (fieldType == null) {
+      throw new IllegalArgumentException("Field '" + key + "' not found in schema");
+    }
 
-  public ResultSetRecord(ResultSet resultSet, DataProvider dialect) {
-    this.resultSet = resultSet;
-    this.dialect = dialect;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> T get(String key, FieldType fieldType) {
     try {
       return fieldType.read(resultSet, key, dialect);
     } catch (SQLException e) {
@@ -28,4 +27,3 @@ public class ResultSetRecord implements DataRecord {
     }
   }
 }
-

@@ -134,14 +134,14 @@ public class StaffSettings implements DataModel {
 
   public static StaffSettings deserialize(DataRecord record) {
     return new StaffSettings(
-        record.get(UUID_FIELD, SCHEMA.get(UUID_FIELD)),
-        record.get(STAFF_MODE_FIELD, SCHEMA.get(STAFF_MODE_FIELD)),
-        record.get(VISIBLE_STAFF_FIELD, SCHEMA.get(VISIBLE_STAFF_FIELD)),
-        record.get(SOCIALSPY_FIELD, SCHEMA.get(SOCIALSPY_FIELD)),
-        record.get(REPORT_ALERTS_FIELD, SCHEMA.get(REPORT_ALERTS_FIELD)),
-        record.get(PERSIST_STAFF_MODE_FIELD, SCHEMA.get(PERSIST_STAFF_MODE_FIELD)),
-        record.get(STAFF_ALERTS_FIELD, SCHEMA.get(STAFF_ALERTS_FIELD)),
-        record.get(CHAT_MODERATION_FIELD, SCHEMA.get(CHAT_MODERATION_FIELD))
+        record.get(UUID_FIELD),
+        record.get(STAFF_MODE_FIELD),
+        record.get(VISIBLE_STAFF_FIELD),
+        record.get(SOCIALSPY_FIELD),
+        record.get(REPORT_ALERTS_FIELD),
+        record.get(PERSIST_STAFF_MODE_FIELD),
+        record.get(STAFF_ALERTS_FIELD),
+        record.get(CHAT_MODERATION_FIELD)
     );
   }
 

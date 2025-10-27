@@ -115,12 +115,12 @@ public class PlayerSettings implements DataModel {
 
   public static PlayerSettings deserialize(DataRecord record) {
     return new PlayerSettings(
-        record.get(UUID_FIELD, SCHEMA.get(UUID_FIELD)),
-        record.get(PRIVATE_MESSAGES_FIELD, SCHEMA.get(PRIVATE_MESSAGES_FIELD)),
-        record.get(CHAT_MESSAGES_FIELD, SCHEMA.get(CHAT_MESSAGES_FIELD)),
-        record.get(PROFANITY_FILTER_FIELD, SCHEMA.get(PROFANITY_FILTER_FIELD)),
-        record.get(SOUND_ALERTS_FIELD, SCHEMA.get(SOUND_ALERTS_FIELD)),
-        record.get(IGNORE_LIST_FIELD, SCHEMA.get(IGNORE_LIST_FIELD))
+        record.get(UUID_FIELD),
+        record.get(PRIVATE_MESSAGES_FIELD),
+        record.get(CHAT_MESSAGES_FIELD),
+        record.get(PROFANITY_FILTER_FIELD),
+        record.get(SOUND_ALERTS_FIELD),
+        record.get(IGNORE_LIST_FIELD)
     );
   }
 
