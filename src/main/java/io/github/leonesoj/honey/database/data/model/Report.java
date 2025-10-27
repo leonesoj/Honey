@@ -132,13 +132,13 @@ public class Report implements DataModel {
 
   public static Report deserialize(DataRecord record) {
     return new Report(
-        record.get(ID_FIELD, SCHEMA.get(ID_FIELD)),
-        record.get(ISSUER_FIELD, SCHEMA.get(ISSUER_FIELD)),
-        record.get(SUBJECT_FIELD, SCHEMA.get(SUBJECT_FIELD)),
-        record.get(SERVER_FIELD, SCHEMA.get(SERVER_FIELD)),
-        record.get(REASON_FIELD, SCHEMA.get(REASON_FIELD)),
-        ReportStatus.valueOf(record.get(STATUS_FIELD, SCHEMA.get(STATUS_FIELD))),
-        record.get(TIMESTAMP_FIELD, SCHEMA.get(TIMESTAMP_FIELD))
+        record.get(ID_FIELD),
+        record.get(ISSUER_FIELD),
+        record.get(SUBJECT_FIELD),
+        record.get(SERVER_FIELD),
+        record.get(REASON_FIELD),
+        ReportStatus.valueOf(record.get(STATUS_FIELD)),
+        record.get(TIMESTAMP_FIELD)
     );
   }
 

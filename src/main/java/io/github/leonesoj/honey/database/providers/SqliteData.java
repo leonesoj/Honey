@@ -125,7 +125,9 @@ public class SqliteData extends DataStore {
 
         try (ResultSet rs = statement.executeQuery()) {
           if (rs.next()) {
-            return Optional.ofNullable(mapper.apply(new ResultSetRecord(rs, getProvider())));
+            return Optional.ofNullable(
+                mapper.apply(new ResultSetRecord(rs, getProvider(), dataContainer.schema()))
+            );
           }
         }
 
@@ -151,7 +153,9 @@ public class SqliteData extends DataStore {
 
         try (ResultSet rs = statement.executeQuery()) {
           while (rs.next()) {
-            result.add(mapper.apply(new ResultSetRecord(rs, getProvider())));
+            result.add(
+                mapper.apply(new ResultSetRecord(rs, getProvider(), dataContainer.schema()))
+            );
           }
         }
       } catch (SQLException exception) {

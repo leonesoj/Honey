@@ -106,7 +106,9 @@ public class MySqlData extends DataStore {
 
         ResultSet resultSet = statement.executeQuery();
         if (resultSet.next()) {
-          return Optional.ofNullable(mapper.apply(new ResultSetRecord(resultSet, getProvider())));
+          return Optional.ofNullable(
+              mapper.apply(new ResultSetRecord(resultSet, getProvider(), dataContainer.schema()))
+          );
         }
 
         return Optional.empty();
@@ -132,7 +134,9 @@ public class MySqlData extends DataStore {
 
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()) {
-          result.add(mapper.apply(new ResultSetRecord(resultSet, getProvider())));
+          result.add(
+              mapper.apply(new ResultSetRecord(resultSet, getProvider(), dataContainer.schema()))
+          );
         }
       } catch (SQLException exception) {
         logQueryManyError(dataContainer.containerName(), index, value, limit, offset, exception);

@@ -109,12 +109,12 @@ public class PlayerProfile implements DataModel {
 
   public static PlayerProfile deserialize(DataRecord record) {
     return new PlayerProfile(
-        record.get(UUID_FIELD, SCHEMA.get(UUID_FIELD)),
-        record.get(HASHED_IP_FIELD, SCHEMA.get(HASHED_IP_FIELD)),
-        record.get(LAST_SEEN_FIELD, SCHEMA.get(LAST_SEEN_FIELD)),
-        record.get(FIRST_SEEN_FIELD, SCHEMA.get(FIRST_SEEN_FIELD)),
-        record.get(PLAY_TIME_FIELD, SCHEMA.get(PLAY_TIME_FIELD)),
-        record.get(LAST_CONNECTED_FIELD, SCHEMA.get(LAST_CONNECTED_FIELD))
+        record.get(UUID_FIELD),
+        record.get(HASHED_IP_FIELD),
+        record.get(LAST_SEEN_FIELD),
+        record.get(FIRST_SEEN_FIELD),
+        record.get(PLAY_TIME_FIELD),
+        record.get(LAST_CONNECTED_FIELD)
     );
   }
 
