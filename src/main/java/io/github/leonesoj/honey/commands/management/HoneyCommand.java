@@ -27,7 +27,7 @@ public class HoneyCommand {
     UUID playerUuid = ((Player) ctx.getSource().getSender()).getUniqueId();
     Honey honey = Honey.getInstance();
 
-    honey.getConfigHandler().reloadConfigs()
+    honey.reloadConfigAsync()
         .thenRun(() -> {
           honey.getChatService().getChannel("general").setFormat(
               honey.config().getString("chat.channels.general.format")
@@ -41,7 +41,8 @@ public class HoneyCommand {
           sendMessageAsync(playerUuid, prefixed("honey.reload.failed"));
           return null;
         });
-    honey.getTranslationHandler().load();
+    honey.getTranslationHandler().reloadTranslationConfigs();
+    honey.getTranslationHandler().loadTranslationStore();
     return Command.SINGLE_SUCCESS;
   }
 

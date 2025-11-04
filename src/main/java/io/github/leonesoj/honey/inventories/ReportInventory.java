@@ -19,7 +19,7 @@ public class ReportInventory extends SerializedInventory {
 
   public ReportInventory(UUID subject, UUID issuer, Locale locale) {
     super(Honey.getInstance(),
-        Honey.getInstance().getConfigHandler().getReportGui(),
+        Honey.getInstance().getTranslationHandler().findBestTranslation("report", locale),
         locale,
         null
     );
@@ -81,7 +81,7 @@ public class ReportInventory extends SerializedInventory {
 
       ConfigurationSection reportItems = getItemSection("report_items");
       reportItems.getKeys(false).forEach(key -> {
-        SerializedItem item = parseItem(reportItems, key, getLocale());
+        SerializedItem item = parseItem(reportItems);
 
         addItem(item, event -> {
           Player player = (Player) event.getWhoClicked();

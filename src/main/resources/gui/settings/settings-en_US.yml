@@ -1,0 +1,148 @@
+main:
+  title: "Settings"
+  size: 27
+  decorator:
+    type: "checkerboard"
+    checkerboard_item_one:
+      type: orange_stained_glass_pane
+    checkerboard_item_two:
+      type: white_stained_glass_pane
+  items:
+    chat_messages:
+      type: book
+      slot: 10
+      display_name: "<aqua>Chat Messages</aqua>"
+      lore:
+        - "<gray>Toggle whether or not you want</gray>"
+        - "<gray>to see <i>public</i> chat messages</gray>"
+        - "<gray>in your current chat channel</gray>"
+        - ""
+        - "<gray>Currently:</gray> %status%"
+        - ""
+        - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
+    private_messages:
+      type: enchanted_book
+      slot: 12
+      display_name: "<light_purple>Private Messages</light_purple>"
+      lore:
+        - "<gray>Toggle whether or not you want</gray>"
+        - "<gray>to allow <i>private</i> chat messaging</gray>"
+        - ""
+        - "<gray>Currently:</gray> %status%"
+        - ""
+        - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
+      glint: true
+    profanity_filter:
+      type: anvil
+      slot: 14
+      display_name: "<red>Profanity Filter</red>"
+      lore:
+        - "<gray>Filter out inappropriate language</gray>"
+        - "<gray>from your public and private chat</gray>"
+        - ""
+        - "<gray>Currently:</gray> %status%"
+        - ""
+        - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
+    sound_alerts:
+      type: note_block
+      slot: 16
+      display_name: "<gold>Sound Alerts</gold>"
+      lore:
+        - "<gray>Toggle whether or not you want</gray>"
+        - "<gray>to be pinged whenever you're</gray>"
+        - "<gray>messaged privately or your name is</gray>"
+        - "<gray>mentioned in your current chat channel</gray>"
+        - ""
+        - "<gray>Currently:</gray> %status%"
+        - ""
+        - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
+
+staff_settings:
+  title: "Staff Settings"
+  size: 45
+  decorator:
+    type: "checkerboard"
+    checkerboard_item_one:
+      type: orange_stained_glass_pane
+    checkerboard_item_two:
+      type: white_stained_glass_pane
+  items:
+    show_staff:
+      type: armor_stand
+      slot: 10
+      display_name: "<gold>Show Staff</gold>"
+      lore:
+        - "<gray>Toggle whether or not you want</gray>"
+        - "<gray>to see players in <i>staff mode</i></gray>"
+        - ""
+        - "<gray>Currently:</gray> %status%"
+        - ""
+        - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
+    social_spy:
+      type: ender_eye
+      slot: 12
+      display_name: "<dark_purple>Social Spy</dark_purple>"
+      lore:
+        - "<gray>Toggle whether or not you want</gray>"
+        - "<gray>to oversee all chat channels and</gray>"
+        - "<gray>private message conversations</gray>"
+        - ""
+        - "<gray>Currently:</gray> %status%"
+        - ""
+        - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
+    persist_staff_mode:
+      type: minecart
+      slot: 14
+      display_name: "<rainbow>Persist Staff Mode</rainbow>"
+      lore:
+        - "<gray>Toggle whether or not you want</gray>"
+        - "<gray><i>persist</i> staff mode across server</gray>"
+        - "<gray>transfers(including on join)</gray>"
+        - ""
+        - "<gray>Currently:</gray> %status%"
+        - ""
+        - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
+    report_alerts:
+      type: book
+      slot: 16
+      display_name: "<red>Report Alerts</red>"
+      lore:
+        - "<gray>Toggle whether or not you want</gray>"
+        - "<gray>to be notified of newly submitted reports</gray>"
+        - ""
+        - "<gray>Currently:</gray> %status%"
+        - ""
+        - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
+    staff_alerts:
+      type: repeater
+      slot: 30
+      display_name: "<aqua>Staff Alerts</aqua>"
+      lore:
+        - "<gray>Toggle whether or not you want</gray>"
+        - "<gray>to see <i>network/server</i> alerts</gray>"
+        - "<gray>related to staff events</gray>"
+        - ""
+        - "<gray>Currently:</gray> %status%"
+        - ""
+        - "<i><yellow>Click to toggle</yellow></i>"
+      sound: block.lever.click
+    chat_mod:
+      type: oak_sign
+      slot: 32
+      display_name: "<light_purple>Chat Mod</light_purple>"
+      lore:
+        - "<gray>Toggle whether or not you want</gray>"
+        - "<gray>to see the chat deletion button</gray>"
+        - "<gray>on player signed messages</gray>"
+        - ""
+        - "<gray>Currently:</gray> %status%"
+        - ""
+        - "<i><yellow>Click to toggle</yellow></i>"

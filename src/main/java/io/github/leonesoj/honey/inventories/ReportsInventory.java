@@ -24,7 +24,7 @@ public class ReportsInventory extends ReactiveInventory<Report> {
 
   public ReportsInventory(Locale locale, int offset) {
     super(Honey.getInstance(),
-        Honey.getInstance().getConfigHandler().getReportViewerGui(),
+        Honey.getInstance().getTranslationHandler().findBestTranslation("report-viewer", locale),
         locale,
         Honey.getInstance().getDataHandler().getReportController().getObserverService(),
         null

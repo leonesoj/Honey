@@ -1,0 +1,22 @@
+items:
+  inspect:
+    type: book
+    display_name: "<red>Inspect</red>"
+    slot: 0
+  random_teleport:
+    type: emerald
+    display_name: "<green>Random Teleport</green>"
+    slot: 1
+    glint: true
+  follow_player:
+    type: lead
+    display_name: "<blue>Follow Player</blue>"
+    slot: 7
+  vanish:
+    type: lime_dye
+    display_name: "<light_purple>Vanish</light_purple> <gray>:</gray> {status}"
+    slot: 8
+    other_data:
+      disabled_type: gray_dye
+      enabled_text: "<green>Enabled</green>"
+      disabled_text: "<red>Disabled</red>"

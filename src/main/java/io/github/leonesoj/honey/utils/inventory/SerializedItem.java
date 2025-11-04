@@ -2,7 +2,6 @@ package io.github.leonesoj.honey.utils.inventory;
 
 import io.github.leonesoj.honey.utils.item.ItemBuilder;
 import java.util.Collections;
-import java.util.Locale;
 import java.util.Map;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -12,7 +11,7 @@ import org.bukkit.configuration.ConfigurationSection;
 public record SerializedItem(int slot, ItemBuilder item, Sound clickSound,
                              Map<String, Object> otherData) {
 
-  public static SerializedItem parseItem(ConfigurationSection section, Locale locale) {
+  public static SerializedItem parseItem(ConfigurationSection section) {
     ConfigurationSection otherDataSection = section.getConfigurationSection("other_data");
     Map<String, Object> otherData;
     if (otherDataSection == null) {
@@ -29,7 +28,7 @@ public record SerializedItem(int slot, ItemBuilder item, Sound clickSound,
     }
 
     return new SerializedItem(section.getInt("slot", -1),
-        new ItemBuilder(section, locale),
+        new ItemBuilder(section),
         sound,
         otherData
     );
