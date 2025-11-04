@@ -1,12 +1,10 @@
 package io.github.leonesoj.honey.utils.item;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
-import io.github.leonesoj.honey.utils.other.LocaleUtil;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.CustomModelData;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -35,7 +33,7 @@ public class ItemBuilder {
     this.item = item;
   }
 
-  public ItemBuilder(@Nullable ConfigurationSection section, Locale locale) {
+  public ItemBuilder(@Nullable ConfigurationSection section) {
     if (section == null) {
       this.item = new ItemStack(Material.STONE, 1);
       setDisplayName("Missing item data");
@@ -49,8 +47,8 @@ public class ItemBuilder {
         section.getInt("amount", 1)
     );
 
-    setDisplayName(LocaleUtil.translate(section, "display_name", locale));
-    setLore(LocaleUtil.translateList(section.getConfigurationSection("lore"), locale));
+    setDisplayName(section.getRichMessage("display_name", Component.empty()));
+    setLore(section.getStringList("lore"));
 
     setGlint(section.getBoolean("glint", false));
     showAttributes(section.getBoolean("show_attributes", false));
@@ -118,11 +116,12 @@ public class ItemBuilder {
     return this;
   }
 
-  public ItemBuilder setLore(List<Component> loreLines) {
-    List<Component> strippedLines = loreLines.stream()
+  public ItemBuilder setLore(List<String> loreLines) {
+    List<Component> components = loreLines.stream()
+        .map(line -> MiniMessage.miniMessage().deserialize(line))
         .map(this::stripDefaultItalic)
         .toList();
-    item.editMeta(itemMeta -> itemMeta.lore(strippedLines));
+    item.editMeta(itemMeta -> itemMeta.lore(components));
     return this;
   }
 

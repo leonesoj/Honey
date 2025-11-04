@@ -34,7 +34,7 @@ public class ReportViewInventory extends ReactiveInventory<Report> {
 
   public ReportViewInventory(Report report, Locale locale, SimpleInventory parent) {
     super(Honey.getInstance(),
-        Honey.getInstance().getConfigHandler().getReportViewerGui()
+        Honey.getInstance().getTranslationHandler().findBestTranslation("report-viewer", locale)
             .getConfigurationSection("report_view"),
         locale,
         Honey.getInstance().getDataHandler().getReportController().getObserverService(),

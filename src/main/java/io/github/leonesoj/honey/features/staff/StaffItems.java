@@ -54,9 +54,10 @@ public class StaffItems implements Listener {
   }
 
   private SerializedItem getConfigItem(String itemKey, Locale locale) {
-    ConfigurationSection itemSection = Honey.getInstance().getConfigHandler().getStaffItems()
+    ConfigurationSection itemSection = Honey.getInstance().getTranslationHandler()
+        .findBestTranslation("staff-items", locale)
         .getConfigurationSection("items." + itemKey);
-    SerializedItem item = SerializedItem.parseItem(itemSection, locale);
+    SerializedItem item = SerializedItem.parseItem(itemSection);
     item.item().build().editPersistentDataContainer(
         pdc -> pdc.set(staffItemKey, PersistentDataType.BOOLEAN, true)
     );

@@ -2,15 +2,11 @@ package io.github.leonesoj.honey.utils.inventory;
 
 import io.github.leonesoj.honey.utils.inventory.InventoryDecorator.BorderPattern;
 import io.github.leonesoj.honey.utils.item.ItemBuilder;
-import io.github.leonesoj.honey.utils.other.LocaleUtil;
-import java.util.Collections;
 import java.util.Locale;
-import java.util.Map;
 import java.util.function.Consumer;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
+import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -27,7 +23,7 @@ public abstract class SerializedInventory extends SimpleInventory {
   public SerializedInventory(JavaPlugin plugin, ConfigurationSection section, Locale locale,
       SimpleInventory parent) {
     super(plugin,
-        LocaleUtil.translate(section, "title", locale),
+        section.getRichMessage("title", Component.empty()),
         section.getInt("size", 54),
         parent
     );
@@ -56,33 +52,23 @@ public abstract class SerializedInventory extends SimpleInventory {
 
     switch (decorator) {
       case "border" -> InventoryDecorator.addBorder(getInventory(),
-          new ItemBuilder(
-              decoratorSection.getConfigurationSection("border_item"),
-              locale).build()
+          new ItemBuilder(decoratorSection.getConfigurationSection("border_item")).build()
       );
       case "checkered_border" -> InventoryDecorator.addBorder(getInventory(),
-          new ItemBuilder(
-              decoratorSection.getConfigurationSection("border_item_one"),
-              locale
-          ).build(),
-          new ItemBuilder(
-              decoratorSection.getConfigurationSection("border_item_two"),
-              locale
-          ).build(),
-         BorderPattern.CHECKERED,
-         force
+          new ItemBuilder(decoratorSection.getConfigurationSection("border_item_one")).build(),
+          new ItemBuilder(decoratorSection.getConfigurationSection("border_item_two")).build(),
+          BorderPattern.CHECKERED,
+          force
       );
       case "checkerboard" -> InventoryDecorator.addCheckerboard(getInventory(),
           new ItemBuilder(
-              decoratorSection.getConfigurationSection("checkerboard_item_one"),
-              locale).build(),
+              decoratorSection.getConfigurationSection("checkerboard_item_one")).build(),
           new ItemBuilder(
-              decoratorSection.getConfigurationSection("checkerboard_item_two"),
-              locale).build(),
+              decoratorSection.getConfigurationSection("checkerboard_item_two")).build(),
           force
       );
       case "fill" -> InventoryDecorator.addFiller(getInventory(),
-          new ItemBuilder(decoratorSection.getConfigurationSection("fill_item"), locale).build(),
+          new ItemBuilder(decoratorSection.getConfigurationSection("fill_item")).build(),
           force
       );
       case "none" -> {
@@ -93,32 +79,12 @@ public abstract class SerializedInventory extends SimpleInventory {
     }
   }
 
-  protected SerializedItem parseItem(ConfigurationSection section, String path, Locale locale) {
-    ConfigurationSection otherDataSection = section.getConfigurationSection(
-        path + ".other_data");
-
-    Map<String, Object> otherData;
-    if (otherDataSection == null) {
-      otherData = Collections.emptyMap();
-    } else {
-      otherData = otherDataSection.getValues(true);
-    }
-
-    org.bukkit.Sound sound = null;
-    if (section.getString(path + ".sound") != null) {
-      sound = Registry.SOUND_EVENT.get(
-          NamespacedKey.fromString(section.getString(path + ".sound")));
-    }
-
-    return new SerializedItem(section.getInt(path + ".slot", -1),
-        new ItemBuilder(section.getConfigurationSection(path), locale),
-        sound,
-        otherData
-    );
+  protected SerializedItem parseItem(ConfigurationSection section) {
+    return SerializedItem.parseItem(section);
   }
 
   protected SerializedItem parseItem(String path) {
-    return parseItem(itemsSection, path, locale);
+    return SerializedItem.parseItem(itemsSection.getConfigurationSection(path));
   }
 
   protected void addItem(SerializedItem item, Consumer<InventoryClickEvent> consumer) {

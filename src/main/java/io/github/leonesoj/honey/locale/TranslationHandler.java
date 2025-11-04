@@ -1,29 +1,35 @@
 package io.github.leonesoj.honey.locale;
 
+import io.github.leonesoj.honey.config.Config;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.PropertyResourceBundle;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.stream.Stream;
-
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.translation.MiniMessageTranslationStore;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.Translator;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class TranslationHandler {
 
   public static final Locale DEFAULT_LOCALE = Locale.US;
+  public static final String[] BUNDLED_LOCALES = {"en_US"};
+
   private static final String TRANSLATIONS_DIR = "translations";
 
   private MiniMessageTranslationStore translationStore;
+  private final Map<String, Map<String, Config>> configTranslations = new HashMap<>();
 
   private final JavaPlugin plugin;
 
@@ -31,7 +37,7 @@ public final class TranslationHandler {
     this.plugin = plugin;
   }
 
-  public void load() {
+  public void loadTranslationStore() {
     if (translationStore != null) {
       GlobalTranslator.translator().removeSource(translationStore);
     }
@@ -51,15 +57,77 @@ public final class TranslationHandler {
   }
 
   private void seedDefaultIfEmpty(Path baseDir) {
-    try (Stream<Path> s = Files.list(baseDir)) {
-      boolean empty = s.findAny().isEmpty();
-      if (!empty) {
+    if (!Files.exists(baseDir)) {
+      try {
+        Files.createDirectories(baseDir);
+      } catch (IOException e) {
+        plugin.getLogger()
+            .log(Level.SEVERE, "Failed to create translations directory: " + baseDir, e);
         return;
       }
-    } catch (IOException ignored) {
     }
 
-    copyFromJarIfPresent("translations/en_US.properties");
+    for (String locale : BUNDLED_LOCALES) {
+      String resourcePath = TRANSLATIONS_DIR + "/" + locale + ".properties";
+      copyFromJarIfPresent(resourcePath);
+    }
+  }
+
+
+  public void registerTranslationConfigs() {
+    loadTranslationConfigs("report", "gui");
+    loadTranslationConfigs("report-viewer", "gui");
+    loadTranslationConfigs("settings", "gui");
+    loadTranslationConfigs("staff-items", "other");
+  }
+
+  private void loadTranslationConfigs(String baseName, String path) {
+    File folder = new File(plugin.getDataFolder(), path + File.separator + baseName);
+    if (!folder.exists() && !folder.mkdirs()) {
+      plugin.getLogger()
+          .warning("Could not create translation folder: " + folder.getAbsolutePath());
+      return;
+    }
+
+    for (String locale : BUNDLED_LOCALES) {
+      String resourcePath = path + "/" + baseName + "/" + baseName + "-" + locale + ".yml";
+      copyFromJarIfPresent(resourcePath);
+    }
+
+    File[] translationFiles = folder.listFiles((dir, name) ->
+        name.startsWith(baseName + "-") && name.endsWith(".yml")
+    );
+
+    if (translationFiles == null || translationFiles.length == 0) {
+      plugin.getLogger().warning("No translations found for base: " + baseName);
+      return;
+    }
+
+    Map<String, Config> localeMap = new HashMap<>();
+    for (File file : translationFiles) {
+      String fileName = file.getName();
+      int dash = fileName.lastIndexOf('-');
+      int dot = fileName.lastIndexOf(".yml");
+      if (dash <= 0 || dot <= dash) {
+        continue;
+      }
+
+      String lang = fileName.substring(dash + 1, dot);
+      String resourcePath = path + "/" + baseName + "/";
+      Config cfg = new Config(plugin, resourcePath, baseName + "-" + lang, false);
+      localeMap.put(normalizeLocaleTag(lang), cfg);
+    }
+
+    configTranslations.put(baseName, localeMap);
+  }
+
+  public CompletableFuture<Void> reloadTranslationConfigs() {
+    CompletableFuture<?>[] futures = configTranslations.values().stream()
+        .flatMap(m -> m.values().stream())
+        .map(Config::loadConfig)
+        .toArray(CompletableFuture[]::new);
+
+    return CompletableFuture.allOf(futures);
   }
 
   private void copyFromJarIfPresent(String resourcePath) {
@@ -126,5 +194,44 @@ public final class TranslationHandler {
     } catch (IllegalArgumentException ignored) {
       return filePath.toString();
     }
+  }
+
+  private String normalizeLocaleTag(String tag) {
+    if (tag == null || tag.isBlank()) {
+      return "";
+    }
+    String t = tag.replace('_', '-').trim();
+    String[] parts = t.split("-");
+    String language = parts[0].toLowerCase(Locale.ROOT);
+    if (parts.length == 1) {
+      return language;
+    }
+    String region = parts[1].toUpperCase(Locale.ROOT);
+    return language + "-" + region;
+  }
+
+  public FileConfiguration findBestTranslation(String baseName, Locale requestedLocale) {
+    Map<String, Config> localeMap = configTranslations.get(baseName);
+    if (localeMap == null || localeMap.isEmpty()) {
+      return null;
+    }
+
+    String language = requestedLocale.getLanguage().toLowerCase(Locale.ROOT);
+    String country = requestedLocale.getCountry().toUpperCase(Locale.ROOT);
+    String exactTag = !country.isEmpty() ? language + "_" + country : language;
+
+    if (localeMap.containsKey(exactTag)) {
+      return localeMap.get(exactTag).getRawConfig();
+    }
+
+    if (localeMap.containsKey(language)) {
+      return localeMap.get(language).getRawConfig();
+    }
+
+    if (localeMap.containsKey("en")) {
+      return localeMap.get("en").getRawConfig();
+    }
+
+    return localeMap.values().stream().findFirst().get().getRawConfig();
   }
 }

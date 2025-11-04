@@ -27,7 +27,7 @@ public class StaffSettingsInventory extends SerializedInventory {
 
   public StaffSettingsInventory(UUID uuid, Locale locale) {
     super(Honey.getInstance(),
-        Honey.getInstance().getConfigHandler().getSettingsGui()
+        Honey.getInstance().getTranslationHandler().findBestTranslation("settings", locale)
             .getConfigurationSection("staff_settings"),
         locale,
         null

@@ -4,7 +4,6 @@ import io.github.leonesoj.honey.chat.ChatChannel;
 import io.github.leonesoj.honey.chat.ChatChannel.ChatChannelBuilder;
 import io.github.leonesoj.honey.chat.ChatService;
 import io.github.leonesoj.honey.config.Config;
-import io.github.leonesoj.honey.config.ConfigHandler;
 import io.github.leonesoj.honey.database.DataHandler;
 import io.github.leonesoj.honey.features.serverlisting.ServerListing;
 import io.github.leonesoj.honey.features.staff.StaffHandler;
@@ -14,6 +13,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.identity.Identity;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -27,7 +27,7 @@ public final class Honey extends JavaPlugin {
     return instance;
   }
 
-  private ConfigHandler configHandler;
+  private Config config;
 
   private DataHandler dataHandler;
 
@@ -43,8 +43,7 @@ public final class Honey extends JavaPlugin {
   public void onEnable() {
     instance = this;
 
-    configHandler = new ConfigHandler(this);
-    configHandler.create();
+    config = new Config(this, "", "config", false);
 
     dataHandler = new DataHandler(this,
         getConfig().getString("database.provider"),
@@ -63,7 +62,8 @@ public final class Honey extends JavaPlugin {
     registerDefaultChannels();
 
     translationHandler = new TranslationHandler(this);
-    translationHandler.load();
+    translationHandler.loadTranslationStore();
+    translationHandler.registerTranslationConfigs();
 
     new ServerListing();
 
@@ -79,12 +79,12 @@ public final class Honey extends JavaPlugin {
     }
   }
 
-  public ConfigHandler getConfigHandler() {
-    return configHandler;
+  public Config config() {
+    return config;
   }
 
-  public Config config() {
-    return getConfigHandler().getMainConfig();
+  public CompletableFuture<Void> reloadConfigAsync() {
+    return config.loadConfig();
   }
 
   public String getServerId() {

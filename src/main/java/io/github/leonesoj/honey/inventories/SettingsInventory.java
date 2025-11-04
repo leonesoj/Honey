@@ -24,7 +24,7 @@ public class SettingsInventory extends SerializedInventory {
 
   public SettingsInventory(UUID uuid, Locale locale) {
     super(Honey.getInstance(),
-        Honey.getInstance().getConfigHandler().getSettingsGui(),
+        Honey.getInstance().getTranslationHandler().findBestTranslation("settings", locale),
         locale,
         null
     );

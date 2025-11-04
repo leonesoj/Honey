@@ -67,7 +67,7 @@ public class SpyService implements Listener {
     Set<UUID> spies = getSpiesBySubject(player.getUniqueId());
 
     if (!spies.isEmpty()) {
-      String commandNotification = Honey.getInstance().getConfigHandler().getMainConfig()
+      String commandNotification = Honey.getInstance().config()
           .getString("chat.spy.format.command");
 
       Component msg = MINI_MESSAGE.deserialize(commandNotification,

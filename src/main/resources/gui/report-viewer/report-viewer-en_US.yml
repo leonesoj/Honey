@@ -1,0 +1,79 @@
+main:
+  title: "Reports"
+  size: 54
+  decorator:
+    type: checkered_border
+    border_item_one:
+      type: red_stained_glass_pane
+    border_item_two:
+      type: gray_stained_glass_pane
+  items:
+    report_item:
+      type: book
+      slot: -1
+      display_name: "<red>Report:</red> <gray>{short-id}</gray>"
+      lore:
+        - ""
+        - "<gray>Subject:</gray> <gold>{subject}</gold>"
+        - "<gray>Issuer:</gray> <gold>{issuer}</gold>"
+        - "<gray>Reason:</gray> <gold>{reason}</gold>"
+        - ""
+        - "<gray>Server:</gray> <gold>{server}</gold>"
+        - "<gray>Status:</gray> <gold>{status}</gold>"
+        - "<gray>Time Since:<gray> <gold>{time_since}</gold>"
+        - ""
+        - "<yellow><i>Click to view more details</i></yellow>"
+    exit_item:
+      type: barrier
+      slot: 49
+      display_name: "<red>Exit</red>"
+
+report_view:
+  title: "Report View"
+  size: 45
+  decorator:
+    type: "fill"
+    fill_item:
+      type: gray_stained_glass_pane
+  items:
+    issuer:
+      type: player_head
+      slot: 11
+      display_name: "<gray>Issuer: <green>{name}</green> ({status})</gray>"
+    subject:
+      type: player_head
+      slot: 15
+      display_name: "<gray>Subject: <red>{name}</red> ({status})</gray>"
+    report_item:
+      type: enchanted_book
+      slot: 13
+      display_name: "<red>Report:</red> <gray>{short-id}</gray>"
+      lore:
+        - ""
+        - "<gray>Status:</gray> <gold>{status}</gold>"
+        - "<gray>Reason:</gray> <gold>{reason}</gold>"
+        - ""
+        - "<gray>Date:</gray> <gold>{date}</gold>"
+        - "<gray>Server:</gray> <gold>{server}</gold>"
+        - ""
+      glint: true
+    mark_as_noted:
+      type: yellow_concrete
+      slot: 30
+      display_name: "<gray>Mark as <yellow><bold>Noted</bold></yellow></gray>"
+    mark_as_resolved:
+      type: lime_concrete
+      slot: 32
+      display_name: "<gray>Mark as <green><bold>Resolved</bold></green></gray>"
+    delete_item:
+      type: cauldron
+      slot: 31
+      display_name: "<dark_red>Delete Report</dark_red>"
+    back_item:
+      type: arrow
+      slot: 28
+      display_name: "<gray>Go Back</gray>"
+    exit_item:
+      type: barrier
+      slot: 34
+      display_name: "<red><i>Exit</i></red>"
