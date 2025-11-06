@@ -1,0 +1,72 @@
+pages:
+  1:
+    - "Welcome to the Server!"
+    - ""
+    - "Our goal is to provide a fun, fair, and safe"
+    - "environment for all players. Please read"
+    - "and follow these rules carefully."
+  2:
+    - "1. Be Respectful"
+    - ""
+    - "Treat everyone with respect. Harassment,"
+    - "discrimination, or hate speech of any kind"
+    - "is not tolerated."
+  3:
+    - "2. Play Fair"
+    - ""
+    - "Use only approved mods and clients."
+    - "Cheating, exploiting bugs, or using"
+    - "unfair advantages is strictly prohibited."
+  4:
+    - "3. Keep Chat Clean"
+    - ""
+    - "No spamming, advertising, or inappropriate"
+    - "language. Avoid excessive negativity or"
+    - "targeting others in chat."
+  5:
+    - "4. Respect Gameplay"
+    - ""
+    - "Do not team in solo modes, abuse glitches,"
+    - "or ruin others' experience intentionally."
+    - "Play the game as intended."
+  6:
+    - "5. Protect Accounts"
+    - ""
+    - "Account security is your responsibility."
+    - "Do not share passwords or log into"
+    - "accounts that aren’t yours."
+  7:
+    - "6. No Scamming or IRL Trading"
+    - ""
+    - "Do not attempt to scam players or trade"
+    - "in-game items for real money, ranks, or"
+    - "external services."
+  8:
+    - "7. Respect Staff and Rules"
+    - ""
+    - "Follow staff instructions and server rules."
+    - "If you disagree with a decision, appeal"
+    - "politely through official channels."
+  9:
+    - "8. Appropriate Names & Skins"
+    - ""
+    - "Offensive or inappropriate usernames,"
+    - "nicknames, or skins are not allowed."
+    - "Keep it friendly and family-safe."
+  10:
+    - "9. No Impersonation"
+    - ""
+    - "Do not impersonate staff, YouTubers, or"
+    - "other players. It can lead to confusion"
+    - "and punishment."
+  11:
+    - "10. Have Fun!"
+    - ""
+    - "Enjoy the games, make friends, and help"
+    - "create a positive community atmosphere!"
+  12:
+    - "Need Help?"
+    - ""
+    - "Use /report to report rule-breaking,"
+    - "or visit our website for appeals and info."
+    - "Thank you for playing fair!"

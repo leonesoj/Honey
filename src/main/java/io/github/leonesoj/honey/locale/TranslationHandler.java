@@ -78,6 +78,7 @@ public final class TranslationHandler {
     loadTranslationConfigs("report", "gui");
     loadTranslationConfigs("report-viewer", "gui");
     loadTranslationConfigs("settings", "gui");
+    loadTranslationConfigs("rulebook", "gui");
     loadTranslationConfigs("staff-items", "other");
   }
 
