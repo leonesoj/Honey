@@ -14,6 +14,7 @@ import io.github.leonesoj.honey.commands.essentials.player.GodCommand;
 import io.github.leonesoj.honey.commands.essentials.player.HealCommand;
 import io.github.leonesoj.honey.commands.essentials.player.PingCommand;
 import io.github.leonesoj.honey.commands.essentials.player.ReportCommand;
+import io.github.leonesoj.honey.commands.essentials.player.RulesCommand;
 import io.github.leonesoj.honey.commands.essentials.player.SettingsCommand;
 import io.github.leonesoj.honey.commands.essentials.player.SpeedCommand;
 import io.github.leonesoj.honey.commands.essentials.world.DayCommand;
@@ -55,6 +56,7 @@ public class HoneyBootstrap implements PluginBootstrap {
       commands.registrar().register(SpeedCommand.create());
       commands.registrar().register(PingCommand.create());
       commands.registrar().register(InvseeCommand.create());
+      commands.registrar().register(RulesCommand.create());
 
       /* ITEM COMMANDS */
       commands.registrar().register(LoreCommand.create());
